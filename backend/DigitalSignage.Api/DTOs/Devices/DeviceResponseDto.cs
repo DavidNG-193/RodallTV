@@ -1,6 +1,6 @@
-namespace DigitalSignage.Api.Entities;
+namespace DigitalSignage.Api.DTOs.Devices;
 
-public class Device
+public class DeviceResponseDto
 {
     public Guid Id { get; set; }
 
@@ -10,13 +10,11 @@ public class Device
 
     public string Location { get; set; } = string.Empty;
 
-    public string AccessTokenHash { get; set; } = string.Empty;
-
-    public string Status { get; set; } = "NotSynced";
+    public string Status { get; set; } = string.Empty;
 
     public string? IpAddress { get; set; }
 
-    public int CurrentPlaylistVersion { get; set; } = 0;
+    public int CurrentPlaylistVersion { get; set; }
 
     public string? AgentVersion { get; set; }
 
@@ -24,7 +22,7 @@ public class Device
 
     public DateTime? LastSyncAt { get; set; }
 
-    public bool IsActive { get; set; } = true;
+    public bool IsActive { get; set; }
 
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime CreatedAt { get; set; }
 }

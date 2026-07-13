@@ -16,6 +16,7 @@ builder.Services.AddEndpointsApiExplorer();
 
 // Services
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<DeviceService>();
 
 // Authentication - JWT
 builder.Services.AddAuthentication(options =>
