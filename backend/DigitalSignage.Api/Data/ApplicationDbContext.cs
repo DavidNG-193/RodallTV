@@ -12,6 +12,7 @@ public class ApplicationDbContext : DbContext
 
     public DbSet<User> Users { get; set; }
     public DbSet<Device> Devices { get; set; }
+    public DbSet<MediaFolder> MediaFolders { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -129,6 +130,45 @@ public class ApplicationDbContext : DbContext
 
             entity.HasIndex(d => d.Name)
                 .IsUnique();
+        });
+
+        modelBuilder.Entity<MediaFolder>(entity =>
+        {
+            entity.ToTable("media_folders");
+
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Id)
+                .HasColumnName("id");
+
+            entity.Property(e => e.Name)
+                .HasColumnName("name")
+                .HasMaxLength(100)
+                .IsRequired();
+
+            entity.Property(e => e.Description)
+                .HasColumnName("description")
+                .HasMaxLength(500);
+
+            entity.Property(e => e.CreatedAt)
+                .HasColumnName("created_at")
+                .IsRequired();
+
+            entity.Property(e => e.CreatedByUserId)
+                .HasColumnName("created_by_user_id")
+                .IsRequired();
+
+            entity.HasIndex(e => e.Name)
+                .IsUnique();
+
+            entity.HasOne(e => e.CreatedByUser)
+                .WithMany()
+                .HasForeignKey(e => e.CreatedByUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.Property(e => e.IsActive)
+                .HasColumnName("is_active")
+                .IsRequired();
         });
     }
 }

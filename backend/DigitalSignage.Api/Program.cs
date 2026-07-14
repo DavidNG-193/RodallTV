@@ -17,6 +17,7 @@ builder.Services.AddEndpointsApiExplorer();
 // Services
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<DeviceService>();
+builder.Services.AddScoped<MediaFolderService>();
 
 // Authentication - JWT
 builder.Services.AddAuthentication(options =>
