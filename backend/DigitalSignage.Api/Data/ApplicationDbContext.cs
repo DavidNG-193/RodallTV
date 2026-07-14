@@ -13,6 +13,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<User> Users { get; set; }
     public DbSet<Device> Devices { get; set; }
     public DbSet<MediaFolder> MediaFolders { get; set; }
+    public DbSet<Media> MediaFiles { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -169,6 +170,87 @@ public class ApplicationDbContext : DbContext
             entity.Property(e => e.IsActive)
                 .HasColumnName("is_active")
                 .IsRequired();
+        });
+
+        modelBuilder.Entity<Media>(entity =>
+        {
+            entity.ToTable("media");
+
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Id).HasColumnName("id");
+
+            entity.Property(e => e.OriginalFileName)
+                .HasColumnName("original_file_name")
+                .HasMaxLength(255)
+                .IsRequired();
+
+            entity.Property(e => e.StoredFileName)
+                .HasColumnName("stored_file_name")
+                .HasMaxLength(255)
+                .IsRequired();
+
+            entity.Property(e => e.FileExtension)
+                .HasColumnName("file_extension")
+                .HasMaxLength(20)
+                .IsRequired();
+
+            entity.Property(e => e.MimeType)
+                .HasColumnName("mime_type")
+                .HasMaxLength(100)
+                .IsRequired();
+
+            entity.Property(e => e.MediaType)
+                .HasColumnName("media_type")
+                .HasMaxLength(20)
+                .IsRequired();
+
+            entity.Property(e => e.FileSizeBytes)
+                .HasColumnName("file_size_bytes")
+                .IsRequired();
+
+            entity.Property(e => e.DurationSeconds)
+                .HasColumnName("duration_seconds");
+
+            entity.Property(e => e.FilePath)
+                .HasColumnName("file_path")
+                .HasMaxLength(500)
+                .IsRequired();
+
+            entity.Property(e => e.HashSha256)
+                .HasColumnName("hash_sha256")
+                .HasMaxLength(64)
+                .IsRequired();
+
+            entity.Property(e => e.UploadedAt)
+                .HasColumnName("uploaded_at")
+                .IsRequired();
+
+            entity.Property(e => e.UploadedByUserId)
+                .HasColumnName("uploaded_by_user_id")
+                .IsRequired();
+
+            entity.Property(e => e.MediaFolderId)
+                .HasColumnName("media_folder_id");
+
+            entity.Property(e => e.IsActive)
+                .HasColumnName("is_active")
+                .IsRequired();
+
+            entity.HasIndex(e => e.StoredFileName).IsUnique();
+            entity.HasIndex(e => e.HashSha256);
+            entity.HasIndex(e => e.UploadedByUserId);
+            entity.HasIndex(e => e.MediaFolderId);
+
+            entity.HasOne(e => e.UploadedByUser)
+                .WithMany()
+                .HasForeignKey(e => e.UploadedByUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.MediaFolder)
+                .WithMany()
+                .HasForeignKey(e => e.MediaFolderId)
+                .OnDelete(DeleteBehavior.Restrict);
         });
     }
 }

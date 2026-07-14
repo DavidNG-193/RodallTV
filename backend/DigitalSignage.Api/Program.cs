@@ -5,6 +5,7 @@ using DigitalSignage.Api.Services;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Http.Features;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +19,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<DeviceService>();
 builder.Services.AddScoped<MediaFolderService>();
+builder.Services.AddScoped<MediaService>();
 
 // Authentication - JWT
 builder.Services.AddAuthentication(options =>
@@ -47,6 +49,19 @@ builder.Services.AddAuthentication(options =>
 // Conexión a PostgreSQL con Entity Framework Core
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+//Limite de carga de archivos
+const long maxUploadSize = 500L * 1024L * 1024L;
+
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = maxUploadSize;
+});
+
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.Limits.MaxRequestBodySize = maxUploadSize;
+});
 
 var app = builder.Build();
 

@@ -24,3 +24,7 @@ media_storage/
 
 # VS Code
 .vscode/
+
+# Uploaded media files
+backend/DigitalSignage.Api/Storage/Media/*
+!backend/DigitalSignage.Api/Storage/Media/.gitkeep

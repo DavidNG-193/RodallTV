@@ -1,6 +1,6 @@
-namespace DigitalSignage.Api.Entities;
+namespace DigitalSignage.Api.DTOs.Media;
 
-public class Media
+public class MediaResponseDto
 {
     public Guid Id { get; set; }
     public string OriginalFileName { get; set; } = string.Empty;
@@ -10,13 +10,11 @@ public class Media
     public string MediaType { get; set; } = string.Empty;
     public long FileSizeBytes { get; set; }
     public int? DurationSeconds { get; set; }
-    public string FilePath { get; set; } = string.Empty;
     public string HashSha256 { get; set; } = string.Empty;
-    public DateTime UploadedAt { get; set; } = DateTime.UtcNow;
+    public DateTime UploadedAt { get; set; }
     public Guid UploadedByUserId { get; set; }
+    public string UploadedByName { get; set; } = string.Empty;
     public Guid? MediaFolderId { get; set; }
-    public bool IsActive { get; set; } = true;
-
-    public User UploadedByUser { get; set; } = null!;
-    public MediaFolder? MediaFolder { get; set; }
+    public string? MediaFolderName { get; set; }
+    public bool IsActive { get; set; }
 }
