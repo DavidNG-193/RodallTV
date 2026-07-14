@@ -14,6 +14,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Device> Devices { get; set; }
     public DbSet<MediaFolder> MediaFolders { get; set; }
     public DbSet<Media> MediaFiles { get; set; }
+    public DbSet<Playlist> Playlists { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -250,6 +251,55 @@ public class ApplicationDbContext : DbContext
             entity.HasOne(e => e.MediaFolder)
                 .WithMany()
                 .HasForeignKey(e => e.MediaFolderId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<Playlist>(entity =>
+        {
+            entity.ToTable("playlists");
+
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Id)
+                .HasColumnName("id");
+
+            entity.Property(e => e.Name)
+                .HasColumnName("name")
+                .HasMaxLength(150)
+                .IsRequired();
+
+            entity.Property(e => e.Description)
+                .HasColumnName("description")
+                .HasMaxLength(500);
+
+            entity.Property(e => e.Version)
+                .HasColumnName("version")
+                .IsRequired();
+
+            entity.Property(e => e.IsActive)
+                .HasColumnName("is_active")
+                .IsRequired();
+
+            entity.Property(e => e.CreatedAt)
+                .HasColumnName("created_at")
+                .IsRequired();
+
+            entity.Property(e => e.UpdatedAt)
+                .HasColumnName("updated_at")
+                .IsRequired();
+
+            entity.Property(e => e.CreatedByUserId)
+                .HasColumnName("created_by_user_id")
+                .IsRequired();
+
+            entity.HasIndex(e => e.Name)
+                .IsUnique();
+
+            entity.HasIndex(e => e.CreatedByUserId);
+
+            entity.HasOne(e => e.CreatedByUser)
+                .WithMany()
+                .HasForeignKey(e => e.CreatedByUserId)
                 .OnDelete(DeleteBehavior.Restrict);
         });
     }

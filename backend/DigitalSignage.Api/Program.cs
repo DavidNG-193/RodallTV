@@ -20,6 +20,7 @@ builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<DeviceService>();
 builder.Services.AddScoped<MediaFolderService>();
 builder.Services.AddScoped<MediaService>();
+builder.Services.AddScoped<PlaylistService>();
 
 // Authentication - JWT
 builder.Services.AddAuthentication(options =>
