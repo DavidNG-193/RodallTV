@@ -346,5 +346,60 @@ public class ApplicationDbContext : DbContext
                 .HasForeignKey(e => e.MediaId)
                 .OnDelete(DeleteBehavior.Restrict);
         });
+
+        modelBuilder.Entity<PlaylistAssignment>(entity =>
+        {
+            entity.ToTable("playlist_assignments");
+
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Id)
+                .HasColumnName("id");
+
+            entity.Property(e => e.DeviceId)
+                .HasColumnName("device_id")
+                .IsRequired();
+
+            entity.Property(e => e.PlaylistId)
+                .HasColumnName("playlist_id")
+                .IsRequired();
+
+            entity.Property(e => e.AssignedByUserId)
+                .HasColumnName("assigned_by_user_id")
+                .IsRequired();
+
+            entity.Property(e => e.AssignedAt)
+                .HasColumnName("assigned_at")
+                .IsRequired();
+
+            entity.Property(e => e.UnassignedAt)
+                .HasColumnName("unassigned_at");
+
+            entity.Property(e => e.IsActive)
+                .HasColumnName("is_active")
+                .IsRequired();
+
+            entity.HasIndex(e => new { e.DeviceId, e.PlaylistId, e.IsActive })
+                .IsUnique();
+
+            entity.HasIndex(e => e.DeviceId);
+            entity.HasIndex(e => e.PlaylistId);
+            entity.HasIndex(e => e.AssignedByUserId);
+
+            entity.HasOne(e => e.Device)
+                .WithMany()
+                .HasForeignKey(e => e.DeviceId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.Playlist)
+                .WithMany()
+                .HasForeignKey(e => e.PlaylistId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.AssignedByUser)
+                .WithMany()
+                .HasForeignKey(e => e.AssignedByUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
     }
 }

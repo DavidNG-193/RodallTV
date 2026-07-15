@@ -63,6 +63,7 @@ public class AuthService
         {
             new Claim(ClaimTypes.Email, email),
             new Claim(ClaimTypes.Role, role)
+            //new Claim(ClaimTypes.NameIdentifier,user.Id.ToString())
         };
 
         var token = new JwtSecurityToken(
