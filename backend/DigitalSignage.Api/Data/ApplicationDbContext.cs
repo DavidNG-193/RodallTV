@@ -15,6 +15,8 @@ public class ApplicationDbContext : DbContext
     public DbSet<MediaFolder> MediaFolders { get; set; }
     public DbSet<Media> MediaFiles { get; set; }
     public DbSet<Playlist> Playlists { get; set; }
+    public DbSet<PlaylistItem> PlaylistItems { get; set; }
+    public DbSet<PlaylistAssignment> PlaylistAssignments { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -300,6 +302,48 @@ public class ApplicationDbContext : DbContext
             entity.HasOne(e => e.CreatedByUser)
                 .WithMany()
                 .HasForeignKey(e => e.CreatedByUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<PlaylistItem>(entity =>
+        {
+            entity.ToTable("playlist_items");
+
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Id)
+                .HasColumnName("id");
+
+            entity.Property(e => e.PlaylistId)
+                .HasColumnName("playlist_id")
+                .IsRequired();
+
+            entity.Property(e => e.MediaId)
+                .HasColumnName("media_id")
+                .IsRequired();
+
+            entity.Property(e => e.Position)
+                .HasColumnName("position")
+                .IsRequired();
+
+            entity.Property(e => e.CustomDurationSeconds)
+                .HasColumnName("custom_duration_seconds");
+
+            entity.Property(e => e.CreatedAt)
+                .HasColumnName("created_at")
+                .IsRequired();
+
+            entity.HasIndex(e => new { e.PlaylistId, e.Position })
+                .IsUnique();
+
+            entity.HasOne(e => e.Playlist)
+                .WithMany()
+                .HasForeignKey(e => e.PlaylistId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.Media)
+                .WithMany()
+                .HasForeignKey(e => e.MediaId)
                 .OnDelete(DeleteBehavior.Restrict);
         });
     }
