@@ -39,17 +39,18 @@ public class AuthService
         user.LastLoginAt = DateTime.UtcNow;
         await _context.SaveChangesAsync();
 
-        string token = GenerateJwtToken(user.Email, user.Role);
+        string token = GenerateJwtToken(user.Email, user.Role, user.Id);
 
         return new LoginResponseDto
         {
             Token = token,
             Email = user.Email,
-            Role = user.Role
+            Role = user.Role,
+            User = user.Id.ToString()
         };
     }
 
-    private string GenerateJwtToken(string email, string role)
+    private string GenerateJwtToken(string email, string role, Guid userId)
     {
         var jwtKey = _configuration["Jwt:Key"]!;
         var jwtIssuer = _configuration["Jwt:Issuer"]!;
@@ -62,8 +63,8 @@ public class AuthService
         var claims = new[]
         {
             new Claim(ClaimTypes.Email, email),
-            new Claim(ClaimTypes.Role, role)
-            //new Claim(ClaimTypes.NameIdentifier,user.Id.ToString())
+            new Claim(ClaimTypes.Role, role),
+            new Claim(ClaimTypes.NameIdentifier, userId.ToString())
         };
 
         var token = new JwtSecurityToken(

@@ -17,6 +17,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Playlist> Playlists { get; set; }
     public DbSet<PlaylistItem> PlaylistItems { get; set; }
     public DbSet<PlaylistAssignment> PlaylistAssignments { get; set; }
+    public DbSet<SyncLog> SyncLogs { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -399,6 +400,43 @@ public class ApplicationDbContext : DbContext
             entity.HasOne(e => e.AssignedByUser)
                 .WithMany()
                 .HasForeignKey(e => e.AssignedByUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<SyncLog>(entity =>
+        {
+            entity.ToTable("sync_logs");
+
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Id).HasColumnName("id");
+
+            entity.Property(e => e.DeviceId).HasColumnName("device_id");
+
+            entity.Property(e => e.PlaylistId).HasColumnName("playlist_id");
+
+            entity.Property(e => e.SyncedVersion).HasColumnName("synced_version");
+
+            entity.Property(e => e.StartedAt).HasColumnName("started_at");
+
+            entity.Property(e => e.FinishedAt).HasColumnName("finished_at");
+
+            entity.Property(e => e.Result).HasColumnName("result");
+
+            entity.Property(e => e.Message).HasColumnName("message");
+
+            entity.Property(e => e.DownloadedFilesCount).HasColumnName("downloaded_files_count");
+
+            entity.Property(e => e.DeletedFilesCount).HasColumnName("deleted_files_count");
+
+            entity.HasOne(e => e.Device)
+                .WithMany()
+                .HasForeignKey(e => e.DeviceId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.Playlist)
+                .WithMany()
+                .HasForeignKey(e => e.PlaylistId)
                 .OnDelete(DeleteBehavior.Restrict);
         });
     }
