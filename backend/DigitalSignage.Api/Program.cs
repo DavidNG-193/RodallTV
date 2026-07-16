@@ -24,6 +24,8 @@ builder.Services.AddScoped<PlaylistService>();
 builder.Services.AddScoped<PlaylistItemService>();
 builder.Services.AddScoped<PlaylistAssignmentService>();
 builder.Services.AddScoped<SyncLogService>();
+builder.Services.AddScoped<DeviceAuthenticationService>();
+builder.Services.AddScoped<AgentService>();
 
 // Authentication - JWT
 builder.Services.AddAuthentication(options =>

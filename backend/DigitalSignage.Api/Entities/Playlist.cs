@@ -12,4 +12,5 @@ public class Playlist
     public Guid CreatedByUserId { get; set; }
 
     public User CreatedByUser { get; set; } = null!;
+    public ICollection<PlaylistItem> Items { get; set; } = new List<PlaylistItem>();
 }

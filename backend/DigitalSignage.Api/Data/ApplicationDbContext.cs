@@ -338,7 +338,7 @@ public class ApplicationDbContext : DbContext
                 .IsUnique();
 
             entity.HasOne(e => e.Playlist)
-                .WithMany()
+                .WithMany(p => p.Items)
                 .HasForeignKey(e => e.PlaylistId)
                 .OnDelete(DeleteBehavior.Cascade);
 
