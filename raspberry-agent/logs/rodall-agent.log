@@ -1,0 +1,1325 @@
+2026-07-16 17:24:09,533 WARNING rodall_agent.player: No existe contenido válido para reproducir.
+2026-07-16 17:24:13,691 WARNING __main__: Servidor no disponible; se conserva la reproducción local: HTTPConnectionPool(host='localhost', port=5026): Max retries exceeded with url: /api/agent/heartbeat (Caused by NewConnectionError("HTTPConnection(host='localhost', port=5026): Failed to establish a new connection: [WinError 10061] No se puede establecer una conexión ya que el equipo de destino denegó expresamente dicha conexión"))
+2026-07-16 17:24:13,692 WARNING rodall_agent.player: No existe contenido válido para reproducir.
+2026-07-16 17:24:32,721 INFO __main__: Agente detenido.
+2026-07-16 17:25:26,986 WARNING rodall_agent.player: No existe contenido válido para reproducir.
+2026-07-16 17:25:28,595 ERROR rodall_agent.sync_manager: Falló la sincronización: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\sync_manager.py", line 74, in synchronize
+    self.api.report_sync(
+    ~~~~~~~~~~~~~~~~~~~~^
+        result="Success",
+        ^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        deleted_files_count=deleted,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\api_client.py", line 88, in report_sync
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\.venv\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+2026-07-16 17:25:28,805 ERROR rodall_agent.sync_manager: No fue posible reportar el fallo al servidor.
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\sync_manager.py", line 74, in synchronize
+    self.api.report_sync(
+    ~~~~~~~~~~~~~~~~~~~~^
+        result="Success",
+        ^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        deleted_files_count=deleted,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\api_client.py", line 88, in report_sync
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\.venv\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\sync_manager.py", line 91, in synchronize
+    self.api.report_sync(
+    ~~~~~~~~~~~~~~~~~~~~^
+        result="Failed",
+        ^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        deleted_files_count=0,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\api_client.py", line 88, in report_sync
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\.venv\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+2026-07-16 17:25:28,820 ERROR __main__: Error no controlado en el ciclo del agente.
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\main.py", line 47, in main
+    player.ensure_running()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\player.py", line 56, in ensure_running
+    self.restart()
+    ~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\player.py", line 50, in restart
+    self.process = subprocess.Popen(command, text=True)
+                   ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\subprocess.py", line 1039, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                        pass_fds, cwd, env,
+                        ^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+                        gid, gids, uid, umask,
+                        ^^^^^^^^^^^^^^^^^^^^^^
+                        start_new_session, process_group)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\subprocess.py", line 1551, in _execute_child
+    hp, ht, pid, tid = _winapi.CreateProcess(executable, args,
+                       ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+                             # no special security
+                             ^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                             cwd,
+                             ^^^^
+                             startupinfo)
+                             ^^^^^^^^^^^^
+FileNotFoundError: [WinError 2] El sistema no puede encontrar el archivo especificado
+2026-07-17 08:45:12,288 WARNING rodall_agent.player: No se encontró el ejecutable de mpv. La sincronización continuará, pero no habrá reproducción. Revisa RODALL_MPV_PATH.
+2026-07-17 08:45:14,842 ERROR rodall_agent.sync_manager: Falló la sincronización: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\sync_manager.py", line 74, in synchronize
+    self.api.report_sync(
+    ~~~~~~~~~~~~~~~~~~~~^
+        result="Success",
+        ^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        deleted_files_count=deleted,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\api_client.py", line 88, in report_sync
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\.venv\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+2026-07-17 08:45:15,297 ERROR rodall_agent.sync_manager: No fue posible reportar el fallo al servidor.
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\sync_manager.py", line 74, in synchronize
+    self.api.report_sync(
+    ~~~~~~~~~~~~~~~~~~~~^
+        result="Success",
+        ^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        deleted_files_count=deleted,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\api_client.py", line 88, in report_sync
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\.venv\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\sync_manager.py", line 91, in synchronize
+    self.api.report_sync(
+    ~~~~~~~~~~~~~~~~~~~~^
+        result="Failed",
+        ^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        deleted_files_count=0,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\api_client.py", line 88, in report_sync
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\.venv\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+2026-07-17 08:45:15,312 WARNING rodall_agent.player: No se encontró el ejecutable de mpv. La sincronización continuará, pero no habrá reproducción. Revisa RODALL_MPV_PATH.
+2026-07-17 08:45:46,500 ERROR rodall_agent.sync_manager: Falló la sincronización: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\sync_manager.py", line 74, in synchronize
+    self.api.report_sync(
+    ~~~~~~~~~~~~~~~~~~~~^
+        result="Success",
+        ^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        deleted_files_count=deleted,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\api_client.py", line 88, in report_sync
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\.venv\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+2026-07-17 08:45:46,846 ERROR rodall_agent.sync_manager: No fue posible reportar el fallo al servidor.
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\sync_manager.py", line 74, in synchronize
+    self.api.report_sync(
+    ~~~~~~~~~~~~~~~~~~~~^
+        result="Success",
+        ^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        deleted_files_count=deleted,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\api_client.py", line 88, in report_sync
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\.venv\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\sync_manager.py", line 91, in synchronize
+    self.api.report_sync(
+    ~~~~~~~~~~~~~~~~~~~~^
+        result="Failed",
+        ^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        deleted_files_count=0,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\api_client.py", line 88, in report_sync
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\.venv\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+2026-07-17 08:45:46,871 WARNING rodall_agent.player: No se encontró el ejecutable de mpv. La sincronización continuará, pero no habrá reproducción. Revisa RODALL_MPV_PATH.
+2026-07-17 08:46:17,862 ERROR rodall_agent.sync_manager: Falló la sincronización: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\sync_manager.py", line 74, in synchronize
+    self.api.report_sync(
+    ~~~~~~~~~~~~~~~~~~~~^
+        result="Success",
+        ^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        deleted_files_count=deleted,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\api_client.py", line 88, in report_sync
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\.venv\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+2026-07-17 08:46:18,201 ERROR rodall_agent.sync_manager: No fue posible reportar el fallo al servidor.
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\sync_manager.py", line 74, in synchronize
+    self.api.report_sync(
+    ~~~~~~~~~~~~~~~~~~~~^
+        result="Success",
+        ^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        deleted_files_count=deleted,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\api_client.py", line 88, in report_sync
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\.venv\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\sync_manager.py", line 91, in synchronize
+    self.api.report_sync(
+    ~~~~~~~~~~~~~~~~~~~~^
+        result="Failed",
+        ^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        deleted_files_count=0,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\api_client.py", line 88, in report_sync
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\.venv\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+2026-07-17 08:46:18,228 WARNING rodall_agent.player: No se encontró el ejecutable de mpv. La sincronización continuará, pero no habrá reproducción. Revisa RODALL_MPV_PATH.
+2026-07-17 08:46:49,317 ERROR rodall_agent.sync_manager: Falló la sincronización: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\sync_manager.py", line 74, in synchronize
+    self.api.report_sync(
+    ~~~~~~~~~~~~~~~~~~~~^
+        result="Success",
+        ^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        deleted_files_count=deleted,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\api_client.py", line 88, in report_sync
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\.venv\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+2026-07-17 08:46:49,666 ERROR rodall_agent.sync_manager: No fue posible reportar el fallo al servidor.
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\sync_manager.py", line 74, in synchronize
+    self.api.report_sync(
+    ~~~~~~~~~~~~~~~~~~~~^
+        result="Success",
+        ^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        deleted_files_count=deleted,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\api_client.py", line 88, in report_sync
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\.venv\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\sync_manager.py", line 91, in synchronize
+    self.api.report_sync(
+    ~~~~~~~~~~~~~~~~~~~~^
+        result="Failed",
+        ^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        deleted_files_count=0,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\api_client.py", line 88, in report_sync
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\.venv\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+2026-07-17 08:46:49,701 WARNING rodall_agent.player: No se encontró el ejecutable de mpv. La sincronización continuará, pero no habrá reproducción. Revisa RODALL_MPV_PATH.
+2026-07-17 08:47:20,473 ERROR rodall_agent.sync_manager: Falló la sincronización: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\sync_manager.py", line 74, in synchronize
+    self.api.report_sync(
+    ~~~~~~~~~~~~~~~~~~~~^
+        result="Success",
+        ^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        deleted_files_count=deleted,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\api_client.py", line 88, in report_sync
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\.venv\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+2026-07-17 08:47:20,697 ERROR rodall_agent.sync_manager: No fue posible reportar el fallo al servidor.
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\sync_manager.py", line 74, in synchronize
+    self.api.report_sync(
+    ~~~~~~~~~~~~~~~~~~~~^
+        result="Success",
+        ^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        deleted_files_count=deleted,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\api_client.py", line 88, in report_sync
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\.venv\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\sync_manager.py", line 91, in synchronize
+    self.api.report_sync(
+    ~~~~~~~~~~~~~~~~~~~~^
+        result="Failed",
+        ^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        deleted_files_count=0,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\api_client.py", line 88, in report_sync
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\.venv\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+2026-07-17 08:47:20,710 WARNING rodall_agent.player: No se encontró el ejecutable de mpv. La sincronización continuará, pero no habrá reproducción. Revisa RODALL_MPV_PATH.
+2026-07-17 08:47:51,432 ERROR rodall_agent.sync_manager: Falló la sincronización: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\sync_manager.py", line 74, in synchronize
+    self.api.report_sync(
+    ~~~~~~~~~~~~~~~~~~~~^
+        result="Success",
+        ^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        deleted_files_count=deleted,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\api_client.py", line 88, in report_sync
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\.venv\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+2026-07-17 08:47:51,653 ERROR rodall_agent.sync_manager: No fue posible reportar el fallo al servidor.
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\sync_manager.py", line 74, in synchronize
+    self.api.report_sync(
+    ~~~~~~~~~~~~~~~~~~~~^
+        result="Success",
+        ^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        deleted_files_count=deleted,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\api_client.py", line 88, in report_sync
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\.venv\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\sync_manager.py", line 91, in synchronize
+    self.api.report_sync(
+    ~~~~~~~~~~~~~~~~~~~~^
+        result="Failed",
+        ^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        deleted_files_count=0,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\api_client.py", line 88, in report_sync
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\.venv\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+2026-07-17 08:47:51,665 WARNING rodall_agent.player: No se encontró el ejecutable de mpv. La sincronización continuará, pero no habrá reproducción. Revisa RODALL_MPV_PATH.
+2026-07-17 08:48:22,815 ERROR rodall_agent.sync_manager: Falló la sincronización: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\sync_manager.py", line 74, in synchronize
+    self.api.report_sync(
+    ~~~~~~~~~~~~~~~~~~~~^
+        result="Success",
+        ^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        deleted_files_count=deleted,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\api_client.py", line 88, in report_sync
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\.venv\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+2026-07-17 08:48:23,207 ERROR rodall_agent.sync_manager: No fue posible reportar el fallo al servidor.
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\sync_manager.py", line 74, in synchronize
+    self.api.report_sync(
+    ~~~~~~~~~~~~~~~~~~~~^
+        result="Success",
+        ^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        deleted_files_count=deleted,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\api_client.py", line 88, in report_sync
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\.venv\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\sync_manager.py", line 91, in synchronize
+    self.api.report_sync(
+    ~~~~~~~~~~~~~~~~~~~~^
+        result="Failed",
+        ^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        deleted_files_count=0,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\api_client.py", line 88, in report_sync
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\.venv\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+2026-07-17 08:48:23,236 WARNING rodall_agent.player: No se encontró el ejecutable de mpv. La sincronización continuará, pero no habrá reproducción. Revisa RODALL_MPV_PATH.
+2026-07-17 08:48:54,233 ERROR rodall_agent.sync_manager: Falló la sincronización: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\sync_manager.py", line 74, in synchronize
+    self.api.report_sync(
+    ~~~~~~~~~~~~~~~~~~~~^
+        result="Success",
+        ^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        deleted_files_count=deleted,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\api_client.py", line 88, in report_sync
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\.venv\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+2026-07-17 08:48:54,576 ERROR rodall_agent.sync_manager: No fue posible reportar el fallo al servidor.
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\sync_manager.py", line 74, in synchronize
+    self.api.report_sync(
+    ~~~~~~~~~~~~~~~~~~~~^
+        result="Success",
+        ^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        deleted_files_count=deleted,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\api_client.py", line 88, in report_sync
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\.venv\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\sync_manager.py", line 91, in synchronize
+    self.api.report_sync(
+    ~~~~~~~~~~~~~~~~~~~~^
+        result="Failed",
+        ^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        deleted_files_count=0,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\api_client.py", line 88, in report_sync
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\.venv\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+2026-07-17 08:48:54,611 WARNING rodall_agent.player: No se encontró el ejecutable de mpv. La sincronización continuará, pero no habrá reproducción. Revisa RODALL_MPV_PATH.
+2026-07-17 08:49:25,705 ERROR rodall_agent.sync_manager: Falló la sincronización: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\sync_manager.py", line 74, in synchronize
+    self.api.report_sync(
+    ~~~~~~~~~~~~~~~~~~~~^
+        result="Success",
+        ^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        deleted_files_count=deleted,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\api_client.py", line 88, in report_sync
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\.venv\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+2026-07-17 08:49:26,033 ERROR rodall_agent.sync_manager: No fue posible reportar el fallo al servidor.
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\sync_manager.py", line 74, in synchronize
+    self.api.report_sync(
+    ~~~~~~~~~~~~~~~~~~~~^
+        result="Success",
+        ^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        deleted_files_count=deleted,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\api_client.py", line 88, in report_sync
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\.venv\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\sync_manager.py", line 91, in synchronize
+    self.api.report_sync(
+    ~~~~~~~~~~~~~~~~~~~~^
+        result="Failed",
+        ^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        deleted_files_count=0,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\api_client.py", line 88, in report_sync
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\.venv\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+2026-07-17 08:49:26,061 WARNING rodall_agent.player: No se encontró el ejecutable de mpv. La sincronización continuará, pero no habrá reproducción. Revisa RODALL_MPV_PATH.
+2026-07-17 08:49:57,087 ERROR rodall_agent.sync_manager: Falló la sincronización: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\sync_manager.py", line 74, in synchronize
+    self.api.report_sync(
+    ~~~~~~~~~~~~~~~~~~~~^
+        result="Success",
+        ^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        deleted_files_count=deleted,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\api_client.py", line 88, in report_sync
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\.venv\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+2026-07-17 08:49:57,424 ERROR rodall_agent.sync_manager: No fue posible reportar el fallo al servidor.
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\sync_manager.py", line 74, in synchronize
+    self.api.report_sync(
+    ~~~~~~~~~~~~~~~~~~~~^
+        result="Success",
+        ^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        deleted_files_count=deleted,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\api_client.py", line 88, in report_sync
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\.venv\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\sync_manager.py", line 91, in synchronize
+    self.api.report_sync(
+    ~~~~~~~~~~~~~~~~~~~~^
+        result="Failed",
+        ^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        deleted_files_count=0,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\api_client.py", line 88, in report_sync
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\.venv\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+2026-07-17 08:49:57,449 WARNING rodall_agent.player: No se encontró el ejecutable de mpv. La sincronización continuará, pero no habrá reproducción. Revisa RODALL_MPV_PATH.
+2026-07-17 08:50:28,571 ERROR rodall_agent.sync_manager: Falló la sincronización: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\sync_manager.py", line 74, in synchronize
+    self.api.report_sync(
+    ~~~~~~~~~~~~~~~~~~~~^
+        result="Success",
+        ^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        deleted_files_count=deleted,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\api_client.py", line 88, in report_sync
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\.venv\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+2026-07-17 08:50:28,967 ERROR rodall_agent.sync_manager: No fue posible reportar el fallo al servidor.
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\sync_manager.py", line 74, in synchronize
+    self.api.report_sync(
+    ~~~~~~~~~~~~~~~~~~~~^
+        result="Success",
+        ^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        deleted_files_count=deleted,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\api_client.py", line 88, in report_sync
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\.venv\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\sync_manager.py", line 91, in synchronize
+    self.api.report_sync(
+    ~~~~~~~~~~~~~~~~~~~~^
+        result="Failed",
+        ^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        deleted_files_count=0,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\api_client.py", line 88, in report_sync
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\.venv\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+2026-07-17 08:50:29,017 WARNING rodall_agent.player: No se encontró el ejecutable de mpv. La sincronización continuará, pero no habrá reproducción. Revisa RODALL_MPV_PATH.
+2026-07-17 08:51:00,134 ERROR rodall_agent.sync_manager: Falló la sincronización: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\sync_manager.py", line 74, in synchronize
+    self.api.report_sync(
+    ~~~~~~~~~~~~~~~~~~~~^
+        result="Success",
+        ^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        deleted_files_count=deleted,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\api_client.py", line 88, in report_sync
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\.venv\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+2026-07-17 08:51:00,459 ERROR rodall_agent.sync_manager: No fue posible reportar el fallo al servidor.
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\sync_manager.py", line 74, in synchronize
+    self.api.report_sync(
+    ~~~~~~~~~~~~~~~~~~~~^
+        result="Success",
+        ^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        deleted_files_count=deleted,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\api_client.py", line 88, in report_sync
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\.venv\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\sync_manager.py", line 91, in synchronize
+    self.api.report_sync(
+    ~~~~~~~~~~~~~~~~~~~~^
+        result="Failed",
+        ^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        deleted_files_count=0,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\api_client.py", line 88, in report_sync
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\.venv\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+2026-07-17 08:51:00,483 WARNING rodall_agent.player: No se encontró el ejecutable de mpv. La sincronización continuará, pero no habrá reproducción. Revisa RODALL_MPV_PATH.
+2026-07-17 08:51:31,487 ERROR rodall_agent.sync_manager: Falló la sincronización: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\sync_manager.py", line 74, in synchronize
+    self.api.report_sync(
+    ~~~~~~~~~~~~~~~~~~~~^
+        result="Success",
+        ^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        deleted_files_count=deleted,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\api_client.py", line 88, in report_sync
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\.venv\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+2026-07-17 08:51:31,829 ERROR rodall_agent.sync_manager: No fue posible reportar el fallo al servidor.
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\sync_manager.py", line 74, in synchronize
+    self.api.report_sync(
+    ~~~~~~~~~~~~~~~~~~~~^
+        result="Success",
+        ^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        deleted_files_count=deleted,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\api_client.py", line 88, in report_sync
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\.venv\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\sync_manager.py", line 91, in synchronize
+    self.api.report_sync(
+    ~~~~~~~~~~~~~~~~~~~~^
+        result="Failed",
+        ^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        deleted_files_count=0,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\api_client.py", line 88, in report_sync
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\.venv\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+2026-07-17 08:51:31,862 WARNING rodall_agent.player: No se encontró el ejecutable de mpv. La sincronización continuará, pero no habrá reproducción. Revisa RODALL_MPV_PATH.
+2026-07-17 08:52:02,862 ERROR rodall_agent.sync_manager: Falló la sincronización: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\sync_manager.py", line 74, in synchronize
+    self.api.report_sync(
+    ~~~~~~~~~~~~~~~~~~~~^
+        result="Success",
+        ^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        deleted_files_count=deleted,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\api_client.py", line 88, in report_sync
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\.venv\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+2026-07-17 08:52:03,277 ERROR rodall_agent.sync_manager: No fue posible reportar el fallo al servidor.
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\sync_manager.py", line 74, in synchronize
+    self.api.report_sync(
+    ~~~~~~~~~~~~~~~~~~~~^
+        result="Success",
+        ^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        deleted_files_count=deleted,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\api_client.py", line 88, in report_sync
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\.venv\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\sync_manager.py", line 91, in synchronize
+    self.api.report_sync(
+    ~~~~~~~~~~~~~~~~~~~~^
+        result="Failed",
+        ^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        deleted_files_count=0,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\api_client.py", line 88, in report_sync
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\.venv\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+2026-07-17 08:52:03,311 WARNING rodall_agent.player: No se encontró el ejecutable de mpv. La sincronización continuará, pero no habrá reproducción. Revisa RODALL_MPV_PATH.
+2026-07-17 08:52:34,087 ERROR rodall_agent.sync_manager: Falló la sincronización: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\sync_manager.py", line 74, in synchronize
+    self.api.report_sync(
+    ~~~~~~~~~~~~~~~~~~~~^
+        result="Success",
+        ^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        deleted_files_count=deleted,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\api_client.py", line 88, in report_sync
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\.venv\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+2026-07-17 08:52:34,308 ERROR rodall_agent.sync_manager: No fue posible reportar el fallo al servidor.
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\sync_manager.py", line 74, in synchronize
+    self.api.report_sync(
+    ~~~~~~~~~~~~~~~~~~~~^
+        result="Success",
+        ^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        deleted_files_count=deleted,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\api_client.py", line 88, in report_sync
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\.venv\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\sync_manager.py", line 91, in synchronize
+    self.api.report_sync(
+    ~~~~~~~~~~~~~~~~~~~~^
+        result="Failed",
+        ^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        deleted_files_count=0,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\api_client.py", line 88, in report_sync
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\.venv\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+2026-07-17 08:52:34,320 WARNING rodall_agent.player: No se encontró el ejecutable de mpv. La sincronización continuará, pero no habrá reproducción. Revisa RODALL_MPV_PATH.
+2026-07-17 08:53:05,023 ERROR rodall_agent.sync_manager: Falló la sincronización: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\sync_manager.py", line 74, in synchronize
+    self.api.report_sync(
+    ~~~~~~~~~~~~~~~~~~~~^
+        result="Success",
+        ^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        deleted_files_count=deleted,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\api_client.py", line 88, in report_sync
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\.venv\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+2026-07-17 08:53:05,243 ERROR rodall_agent.sync_manager: No fue posible reportar el fallo al servidor.
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\sync_manager.py", line 74, in synchronize
+    self.api.report_sync(
+    ~~~~~~~~~~~~~~~~~~~~^
+        result="Success",
+        ^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        deleted_files_count=deleted,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\api_client.py", line 88, in report_sync
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\.venv\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\sync_manager.py", line 91, in synchronize
+    self.api.report_sync(
+    ~~~~~~~~~~~~~~~~~~~~^
+        result="Failed",
+        ^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        deleted_files_count=0,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\api_client.py", line 88, in report_sync
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\.venv\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+2026-07-17 08:53:05,254 WARNING rodall_agent.player: No se encontró el ejecutable de mpv. La sincronización continuará, pero no habrá reproducción. Revisa RODALL_MPV_PATH.
+2026-07-17 08:53:36,235 ERROR rodall_agent.sync_manager: Falló la sincronización: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\sync_manager.py", line 74, in synchronize
+    self.api.report_sync(
+    ~~~~~~~~~~~~~~~~~~~~^
+        result="Success",
+        ^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        deleted_files_count=deleted,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\api_client.py", line 88, in report_sync
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\.venv\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+2026-07-17 08:53:36,456 ERROR rodall_agent.sync_manager: No fue posible reportar el fallo al servidor.
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\sync_manager.py", line 74, in synchronize
+    self.api.report_sync(
+    ~~~~~~~~~~~~~~~~~~~~^
+        result="Success",
+        ^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        deleted_files_count=deleted,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\api_client.py", line 88, in report_sync
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\.venv\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\sync_manager.py", line 91, in synchronize
+    self.api.report_sync(
+    ~~~~~~~~~~~~~~~~~~~~^
+        result="Failed",
+        ^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        deleted_files_count=0,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\api_client.py", line 88, in report_sync
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\.venv\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+2026-07-17 08:53:36,468 WARNING rodall_agent.player: No se encontró el ejecutable de mpv. La sincronización continuará, pero no habrá reproducción. Revisa RODALL_MPV_PATH.
+2026-07-17 08:54:07,205 ERROR rodall_agent.sync_manager: Falló la sincronización: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\sync_manager.py", line 74, in synchronize
+    self.api.report_sync(
+    ~~~~~~~~~~~~~~~~~~~~^
+        result="Success",
+        ^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        deleted_files_count=deleted,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\api_client.py", line 88, in report_sync
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\.venv\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+2026-07-17 08:54:07,441 ERROR rodall_agent.sync_manager: No fue posible reportar el fallo al servidor.
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\sync_manager.py", line 74, in synchronize
+    self.api.report_sync(
+    ~~~~~~~~~~~~~~~~~~~~^
+        result="Success",
+        ^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        deleted_files_count=deleted,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\api_client.py", line 88, in report_sync
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\.venv\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\sync_manager.py", line 91, in synchronize
+    self.api.report_sync(
+    ~~~~~~~~~~~~~~~~~~~~^
+        result="Failed",
+        ^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        deleted_files_count=0,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\api_client.py", line 88, in report_sync
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\.venv\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+2026-07-17 08:54:07,455 WARNING rodall_agent.player: No se encontró el ejecutable de mpv. La sincronización continuará, pero no habrá reproducción. Revisa RODALL_MPV_PATH.
+2026-07-17 08:54:28,465 INFO __main__: Agente detenido.
+2026-07-17 08:54:46,913 WARNING rodall_agent.player: No se encontró el ejecutable de mpv. La sincronización continuará, pero no habrá reproducción. Revisa RODALL_MPV_PATH.
+2026-07-17 08:54:47,669 ERROR rodall_agent.sync_manager: Falló la sincronización: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\sync_manager.py", line 74, in synchronize
+    self.api.report_sync(
+    ~~~~~~~~~~~~~~~~~~~~^
+        result="Success",
+        ^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        deleted_files_count=deleted,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\api_client.py", line 88, in report_sync
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\.venv\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+2026-07-17 08:54:47,897 ERROR rodall_agent.sync_manager: No fue posible reportar el fallo al servidor.
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\sync_manager.py", line 74, in synchronize
+    self.api.report_sync(
+    ~~~~~~~~~~~~~~~~~~~~^
+        result="Success",
+        ^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        deleted_files_count=deleted,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\api_client.py", line 88, in report_sync
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\.venv\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\sync_manager.py", line 91, in synchronize
+    self.api.report_sync(
+    ~~~~~~~~~~~~~~~~~~~~^
+        result="Failed",
+        ^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        deleted_files_count=0,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\api_client.py", line 88, in report_sync
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\.venv\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+2026-07-17 08:54:47,913 WARNING rodall_agent.player: No se encontró el ejecutable de mpv. La sincronización continuará, pero no habrá reproducción. Revisa RODALL_MPV_PATH.
+2026-07-17 08:54:50,915 INFO __main__: Agente detenido.
+2026-07-17 09:44:03,948 INFO rodall_agent.player: mpv iniciado con la playlist activa.
+2026-07-17 09:44:07,991 ERROR rodall_agent.sync_manager: Falló la sincronización: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\sync_manager.py", line 74, in synchronize
+    self.api.report_sync(
+    ~~~~~~~~~~~~~~~~~~~~^
+        result="Success",
+        ^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        deleted_files_count=deleted,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\api_client.py", line 88, in report_sync
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\.venv\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+2026-07-17 09:44:08,786 ERROR rodall_agent.sync_manager: No fue posible reportar el fallo al servidor.
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\sync_manager.py", line 74, in synchronize
+    self.api.report_sync(
+    ~~~~~~~~~~~~~~~~~~~~^
+        result="Success",
+        ^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        deleted_files_count=deleted,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\api_client.py", line 88, in report_sync
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\.venv\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\sync_manager.py", line 91, in synchronize
+    self.api.report_sync(
+    ~~~~~~~~~~~~~~~~~~~~^
+        result="Failed",
+        ^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        deleted_files_count=0,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\api_client.py", line 88, in report_sync
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\.venv\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+2026-07-17 09:44:39,557 ERROR rodall_agent.sync_manager: Falló la sincronización: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\sync_manager.py", line 74, in synchronize
+    self.api.report_sync(
+    ~~~~~~~~~~~~~~~~~~~~^
+        result="Success",
+        ^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        deleted_files_count=deleted,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\api_client.py", line 88, in report_sync
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\.venv\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+2026-07-17 09:44:39,785 ERROR rodall_agent.sync_manager: No fue posible reportar el fallo al servidor.
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\sync_manager.py", line 74, in synchronize
+    self.api.report_sync(
+    ~~~~~~~~~~~~~~~~~~~~^
+        result="Success",
+        ^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        deleted_files_count=deleted,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\api_client.py", line 88, in report_sync
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\.venv\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\sync_manager.py", line 91, in synchronize
+    self.api.report_sync(
+    ~~~~~~~~~~~~~~~~~~~~^
+        result="Failed",
+        ^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        deleted_files_count=0,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\api_client.py", line 88, in report_sync
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\.venv\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:5026/api/agent/sync-report
+2026-07-17 09:44:52,893 INFO __main__: Agente detenido.
+2026-07-17 10:10:29,914 INFO rodall_agent.player: mpv iniciado con la playlist activa.
+2026-07-17 10:10:33,679 INFO rodall_agent.sync_manager: Playlist versión 3 activada.
+2026-07-17 10:10:33,786 INFO rodall_agent.player: mpv iniciado con la playlist activa.
+2026-07-17 10:13:34,268 INFO __main__: Agente detenido.
+2026-07-17 10:25:09,279 INFO rodall_agent.player: mpv iniciado con la playlist activa.
+2026-07-17 10:25:44,541 WARNING __main__: Servidor no disponible; se conserva la reproducción local: HTTPConnectionPool(host='localhost', port=5026): Max retries exceeded with url: /api/agent/heartbeat (Caused by NewConnectionError("HTTPConnection(host='localhost', port=5026): Failed to establish a new connection: [WinError 10061] No se puede establecer una conexión ya que el equipo de destino denegó expresamente dicha conexión"))
+2026-07-17 10:26:18,650 WARNING __main__: Servidor no disponible; se conserva la reproducción local: HTTPConnectionPool(host='localhost', port=5026): Max retries exceeded with url: /api/agent/heartbeat (Caused by NewConnectionError("HTTPConnection(host='localhost', port=5026): Failed to establish a new connection: [WinError 10061] No se puede establecer una conexión ya que el equipo de destino denegó expresamente dicha conexión"))
+2026-07-17 10:29:05,559 INFO __main__: Agente detenido.
+2026-07-17 10:39:35,572 INFO rodall_agent.player: mpv iniciado con la playlist activa.
+2026-07-17 10:41:31,507 INFO __main__: Agente detenido.
+2026-07-17 11:16:38,886 INFO rodall_agent.player: mpv iniciado con la playlist activa.
+2026-07-17 11:16:51,688 INFO __main__: Agente detenido.
+2026-07-17 11:33:20,450 INFO __main__: Agente RodallTV iniciado.
+2026-07-17 11:33:21,585 INFO rodall_agent.player: mpv iniciado con la playlist activa.
+2026-07-17 11:35:41,541 INFO __main__: Agente detenido.
+2026-07-17 11:52:09,238 INFO __main__: Agente RodallTV iniciado.
+2026-07-17 11:52:10,117 ERROR __main__: Error no controlado en el ciclo del agente.
+Traceback (most recent call last):
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\main.py", line 63, in main
+    player.ensure_running()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\David.Nicolas\RodallTV\raspberry-agent\rodall_agent\player.py", line 104, in ensure_running
+    self.restart()
+    ^^^^^^^^^^^^
+AttributeError: 'MpvPlayer' object has no attribute 'restart'
+2026-07-17 11:55:10,896 INFO __main__: Agente RodallTV iniciado.
+2026-07-17 11:55:11,457 INFO rodall_agent.player: Playlist de mpv generada con 2 archivos: C:\Users\David.Nicolas\RodallTV\raspberry-agent\runtime\mpv_playlist.m3u
+2026-07-17 11:55:11,458 INFO rodall_agent.player: Iniciando mpv con la playlist: C:\Users\David.Nicolas\RodallTV\raspberry-agent\runtime\mpv_playlist.m3u
+2026-07-17 11:55:11,462 INFO rodall_agent.player: mpv iniciado correctamente.
+2026-07-17 11:58:22,453 INFO rodall_agent.player: Deteniendo mpv.
+2026-07-17 11:58:22,546 INFO __main__: Agente detenido.

@@ -1,0 +1,36 @@
+{
+  "hasAssignment": true,
+  "playlistId": "4b1f12c9-1d3a-4d3b-bad3-c4c24e645927",
+  "playlistName": "Playlist de prueba",
+  "playlistVersion": 3,
+  "currentDeviceVersion": 0,
+  "requiresSync": false,
+  "items": [
+    {
+      "playlistItemId": "48ef7368-5370-4402-8e7f-f36bf7c9b7f6",
+      "mediaId": "3dc0e34e-7b15-4805-a829-8a7e2eed8bea",
+      "position": 1,
+      "originalFileName": "CDU 3.png",
+      "storedFileName": "2f5976a1eed34f12baa275dcfadb041f.png",
+      "mediaType": "Image",
+      "mimeType": "image/png",
+      "fileSizeBytes": 13166,
+      "hashSha256": "8e858a07acc03480d9deebfec7d55c630d9abd17c696ecebf90e67def53b1a66",
+      "customDurationSeconds": 10,
+      "downloadUrl": "http://localhost:5026/api/agent/media/3dc0e34e-7b15-4805-a829-8a7e2eed8bea/download"
+    },
+    {
+      "playlistItemId": "e774c0b4-68ea-4865-941b-ef405803bbb6",
+      "mediaId": "75267bdd-2370-43ca-bce1-4804761b1e50",
+      "position": 2,
+      "originalFileName": "CDU 3.png",
+      "storedFileName": "a63edc89d5f5410fb1f1f4122f469369.png",
+      "mediaType": "Image",
+      "mimeType": "image/png",
+      "fileSizeBytes": 13166,
+      "hashSha256": "8e858a07acc03480d9deebfec7d55c630d9abd17c696ecebf90e67def53b1a66",
+      "customDurationSeconds": null,
+      "downloadUrl": "http://localhost:5026/api/agent/media/75267bdd-2370-43ca-bce1-4804761b1e50/download"
+    }
+  ]
+}
