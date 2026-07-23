@@ -5,6 +5,7 @@ import { DevicesPage } from "../pages/DevicesPage";
 import { LoginPage } from "../pages/LoginPage";
 import { ProtectedRoute } from "./ProtectedRoute";
 import { MediaFoldersPage } from "../pages/MediaFoldersPage";
+import { MediaPage } from "../pages/MediaPage";
 
 export function AppRouter() {
   return (
@@ -21,6 +22,7 @@ export function AppRouter() {
         <Route path="/" element={<DashboardPage />} />
         <Route path="/devices" element={<DevicesPage />} />
         <Route path="/media-folders" element={<MediaFoldersPage />} />
+        <Route path="/media" element={<MediaPage />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />
