@@ -18,9 +18,10 @@ public class DevicesController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<List<DeviceResponseDto>>> GetAll()
+    public async Task<ActionResult<List<DeviceResponseDto>>> GetAll(
+        [FromQuery] string? status = "active")
     {
-        var devices = await _deviceService.GetAllAsync();
+        var devices = await _deviceService.GetAllAsync(status);
 
         return Ok(devices);
     }
@@ -123,5 +124,21 @@ public class DevicesController : ControllerBase
         }
 
         return NoContent();
+    }
+
+    [HttpPatch("{id:guid}/reactivate")]
+    public async Task<ActionResult<DeviceResponseDto>> Reactivate(Guid id)
+    {
+        var device = await _deviceService.ReactivateAsync(id);
+
+        if (device is null)
+        {
+            return NotFound(new
+            {
+                message = "Dispositivo no encontrado."
+            });
+        }
+
+        return Ok(device);
     }
 }

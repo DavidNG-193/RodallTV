@@ -6,5 +6,5 @@ public class UpdateDeviceRequestDto
 
     public string Location { get; set; } = string.Empty;
 
-    public bool IsActive { get; set; }
+    public bool? IsActive { get; set; }
 }

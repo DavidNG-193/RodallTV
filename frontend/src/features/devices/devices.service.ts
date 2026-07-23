@@ -3,12 +3,20 @@ import type {
   CreateDeviceRequest,
   CreateDeviceResponse,
   Device,
+  DeviceListFilter,
   UpdateDeviceRequest,
 } from "./devices.types";
 
 export const devicesService = {
-  async getAll(): Promise<Device[]> {
-    const response = await httpClient.get<Device[]>("/api/Devices");
+  async getAll(
+    filter: DeviceListFilter = "active",
+  ): Promise<Device[]> {
+    const response = await httpClient.get<Device[]>("/api/Devices", {
+      params: {
+        status: filter,
+      },
+    });
+
     return response.data;
   },
 
@@ -37,5 +45,13 @@ export const devicesService = {
 
   async deactivate(id: string): Promise<void> {
     await httpClient.delete(`/api/Devices/${id}`);
+  },
+
+  async reactivate(id: string): Promise<Device> {
+    const response = await httpClient.patch<Device>(
+      `/api/Devices/${id}/reactivate`,
+    );
+
+    return response.data;
   },
 };

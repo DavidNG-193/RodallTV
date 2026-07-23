@@ -15,10 +15,21 @@ public class DeviceService
         _context = context;
     }
 
-    public async Task<List<DeviceResponseDto>> GetAllAsync()
+    public async Task<List<DeviceResponseDto>> GetAllAsync(
+        string? status = "active")
     {
-        return await _context.Devices
+        var query = _context.Devices
             .AsNoTracking()
+            .AsQueryable();
+
+        query = (status ?? "active").Trim().ToLowerInvariant() switch
+        {
+            "inactive" => query.Where(device => !device.IsActive),
+            "all" => query,
+            _ => query.Where(device => device.IsActive)
+        };
+
+        return await query
             .OrderBy(device => device.Name)
             .Select(device => MapToResponseDto(device))
             .ToListAsync();
@@ -108,9 +119,36 @@ public class DeviceService
 
         device.Name = normalizedName;
         device.Location = normalizedLocation;
-        device.IsActive = request.IsActive;
+
+        if (request.IsActive.HasValue)
+        {
+            device.IsActive = request.IsActive.Value;
+        }
 
         await _context.SaveChangesAsync();
+
+        return MapToResponseDto(device);
+    }
+
+    public async Task<DeviceResponseDto?> ReactivateAsync(Guid id)
+    {
+        var device = await _context.Devices
+            .FirstOrDefaultAsync(device => device.Id == id);
+
+        if (device is null)
+        {
+            return null;
+        }
+
+        if (!device.IsActive)
+        {
+            device.IsActive = true;
+            device.Status = "NotSynced";
+            device.CurrentPlaylistVersion = 0;
+            device.LastSyncAt = null;
+
+            await _context.SaveChangesAsync();
+        }
 
         return MapToResponseDto(device);
     }

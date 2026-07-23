@@ -1,5 +1,10 @@
-import { Pencil, Plus, Power, RefreshCw } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { Pencil, Plus, Power, RefreshCw, RotateCcw } from "lucide-react";
+import {
+  useCallback,
+  useEffect,
+  useState,
+  type ChangeEvent,
+} from "react";
 import axios from "axios";
 import { EmptyState } from "../components/common/EmptyState";
 import { LoadingState } from "../components/common/LoadingState";
@@ -10,6 +15,7 @@ import type {
   CreateDeviceRequest,
   CreateDeviceResponse,
   Device,
+  DeviceListFilter,
   UpdateDeviceRequest,
 } from "../features/devices/devices.types";
 
@@ -42,23 +48,24 @@ export function DevicesPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [filter, setFilter] = useState<DeviceListFilter>("active");
 
   const loadDevices = useCallback(async () => {
     try {
-      const data = await devicesService.getAll();
+      const data = await devicesService.getAll(filter);
       setDevices(data);
     } catch (error) {
       setErrorMessage(getErrorMessage(error));
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [filter]);
 
   useEffect(() => {
     let isCancelled = false;
 
     void devicesService
-      .getAll()
+      .getAll(filter)
       .then((data) => {
         if (!isCancelled) setDevices(data);
       })
@@ -72,12 +79,20 @@ export function DevicesPage() {
     return () => {
       isCancelled = true;
     };
-  }, []);
+  }, [filter]);
 
   const refreshDevices = () => {
     setIsLoading(true);
     setErrorMessage("");
     void loadDevices();
+  };
+
+  const handleFilterChange = (
+    event: ChangeEvent<HTMLSelectElement>,
+  ) => {
+    setFilter(event.target.value as DeviceListFilter);
+    setIsLoading(true);
+    setErrorMessage("");
   };
 
   const openCreateForm = () => {
@@ -135,8 +150,27 @@ export function DevicesPage() {
 
     if (!confirmed) return;
 
+    setErrorMessage("");
+
     try {
       await devicesService.deactivate(device.id);
+      await loadDevices();
+    } catch (error) {
+      setErrorMessage(getErrorMessage(error));
+    }
+  };
+
+  const handleReactivate = async (device: Device) => {
+    const confirmed = window.confirm(
+      `¿Deseas reactivar el dispositivo "${device.name}"?`,
+    );
+
+    if (!confirmed) return;
+
+    setErrorMessage("");
+
+    try {
+      await devicesService.reactivate(device.id);
       await loadDevices();
     } catch (error) {
       setErrorMessage(getErrorMessage(error));
@@ -153,6 +187,20 @@ export function DevicesPage() {
         </div>
 
         <div className="page-heading__actions">
+          <div className="device-filter">
+            <label htmlFor="device-filter">Mostrar</label>
+
+            <select
+              id="device-filter"
+              value={filter}
+              onChange={handleFilterChange}
+            >
+              <option value="active">Activos</option>
+              <option value="inactive">Inactivos</option>
+              <option value="all">Todos</option>
+            </select>
+          </div>
+
           <button
             type="button"
             className="button button--secondary"
@@ -218,6 +266,7 @@ export function DevicesPage() {
                   <th>Nombre</th>
                   <th>Ubicación</th>
                   <th>Estado</th>
+                  <th>Registro</th>
                   <th>IP</th>
                   <th>Última conexión</th>
                   <th>Última sincronización</th>
@@ -233,6 +282,17 @@ export function DevicesPage() {
                     </td>
                     <td>{device.location ?? "Sin ubicación"}</td>
                     <td><StatusBadge status={device.status} /></td>
+                    <td>
+                      <span
+                        className={
+                          device.isActive
+                            ? "record-status record-status--active"
+                            : "record-status record-status--inactive"
+                        }
+                      >
+                        {device.isActive ? "Activo" : "Inactivo"}
+                      </span>
+                    </td>
                     <td>{device.ipAddress ?? "Sin registro"}</td>
                     <td>{formatDate(device.lastConnectionAt)}</td>
                     <td>{formatDate(device.lastSyncAt)}</td>
@@ -255,6 +315,17 @@ export function DevicesPage() {
                             onClick={() => void handleDeactivate(device)}
                           >
                             <Power size={17} aria-hidden="true" />
+                          </button>
+                        )}
+
+                        {!device.isActive && (
+                          <button
+                            type="button"
+                            className="icon-button"
+                            title="Reactivar dispositivo"
+                            onClick={() => void handleReactivate(device)}
+                          >
+                            <RotateCcw size={17} aria-hidden="true" />
                           </button>
                         )}
                       </div>

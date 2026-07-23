@@ -5,6 +5,8 @@ export type DeviceStatus =
   | "Error"
   | "NotSynced";
 
+export type DeviceListFilter = "active" | "inactive" | "all";
+
 export interface Device {
   id: string;
   deviceUuid: string;
