@@ -50,6 +50,7 @@ async function fetchSyncLogData(
     syncLogsService.getAll({
       deviceId,
       result,
+      limit: 30,
     }),
     devicesService.getAll("all"),
   ]);
