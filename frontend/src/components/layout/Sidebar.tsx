@@ -2,6 +2,7 @@ import {
   Clapperboard,
   FolderOpen,
   LayoutDashboard,
+  Link2,
   ListVideo,
   Monitor,
   ScrollText,
@@ -23,6 +24,7 @@ const links: SidebarLink[] = [
   { to: "/media-folders", label: "Carpetas", icon: FolderOpen },
   { to: "/media", label: "Multimedia", icon: Clapperboard },
   { to: "/playlists", label: "Playlists", icon: ListVideo },
+  { to: "/assignments", label: "Asignaciones", icon: Link2 },
   { to: "/sync-logs", label: "Sincronizaciones", icon: ScrollText },
 ];
 

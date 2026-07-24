@@ -741,6 +741,140 @@ label {
   border-top: 1px solid #eeeeee;
 }
 
+.playlist-form,
+.playlist-item-form {
+  display: grid;
+  gap: 1rem;
+}
+
+.playlist-grid {
+  display: grid;
+  grid-template-columns:
+    repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+}
+
+.playlist-card {
+  position: relative;
+  overflow: hidden;
+  padding: 1.2rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-medium);
+  background:
+    linear-gradient(
+      145deg,
+      #ffffff,
+      #fbfaf7
+    );
+  box-shadow: 0 8px 22px rgb(0 0 0 / 8%);
+}
+
+.playlist-card::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  content: "";
+  background:
+    linear-gradient(
+      90deg,
+      var(--color-gold-dark),
+      var(--color-gold-light),
+      var(--color-gold-dark)
+    );
+}
+
+.playlist-card__heading {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.playlist-card__heading h3 {
+  margin-bottom: 0;
+}
+
+.playlist-card__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.8rem;
+  font-weight: 700;
+}
+
+.playlist-card > small {
+  color: var(--color-text-muted);
+}
+
+.playlist-card__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.55rem;
+  margin-top: 1rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid #eeeeee;
+}
+
+.playlist-item-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.playlist-item-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.9rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-small);
+  background: #ffffff;
+}
+
+.playlist-item-row__position {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--color-black);
+  background:
+    linear-gradient(
+      145deg,
+      #f4df9b,
+      #c6932e
+    );
+  font-weight: 900;
+}
+
+.playlist-item-row__content strong,
+.playlist-item-row__content small {
+  display: block;
+}
+
+.playlist-item-row__content small {
+  margin-top: 0.25rem;
+  color: var(--color-text-muted);
+}
+
+.playlist-item-row__actions {
+  display: flex;
+  gap: 0.45rem;
+}
+
+@media (max-width: 760px) {
+  .playlist-item-row {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .playlist-item-row__actions {
+    grid-column: 1 / -1;
+    justify-content: flex-end;
+  }
+}
+
 .media-upload-form {
   display: grid;
   gap: 1rem;
@@ -909,5 +1043,99 @@ label {
 
   .media-filter select {
     flex: 1;
+  }
+}
+
+.assignment-form {
+  display: grid;
+  gap: 1rem;
+}
+
+.assignment-grid {
+  display: grid;
+  grid-template-columns:
+    repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+}
+
+.assignment-card {
+  display: grid;
+  grid-template-columns:
+    auto minmax(0, 1fr);
+  gap: 1rem;
+  padding: 1.2rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-medium);
+  background: #ffffff;
+  box-shadow:
+    0 8px 22px rgb(0 0 0 / 8%);
+}
+
+.assignment-card__icon {
+  display: grid;
+  width: 48px;
+  height: 48px;
+  place-items: center;
+  border-radius: var(--radius-small);
+  color: var(--color-gold-dark);
+  background: #fff4cf;
+}
+
+.assignment-card__content h3 {
+  margin-bottom: 0.35rem;
+}
+
+.assignment-card__content p {
+  margin-bottom: 0.55rem;
+  font-weight: 700;
+}
+
+.assignment-card__content small {
+  display: block;
+  color: var(--color-text-muted);
+}
+
+.assignment-card__actions {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.55rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid #eeeeee;
+}
+
+.sync-log-filters {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.sync-result {
+  display: inline-flex;
+  padding: 0.3rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.sync-result--success {
+  color: var(--color-success);
+  background: var(--color-success-soft);
+}
+
+.sync-result--failed {
+  color: var(--color-danger);
+  background: var(--color-danger-soft);
+}
+
+.sync-result--nochanges {
+  color: var(--color-info);
+  background: var(--color-info-soft);
+}
+
+@media (max-width: 760px) {
+  .sync-log-filters {
+    grid-template-columns: 1fr;
   }
 }

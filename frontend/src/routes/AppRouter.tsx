@@ -6,6 +6,10 @@ import { LoginPage } from "../pages/LoginPage";
 import { ProtectedRoute } from "./ProtectedRoute";
 import { MediaFoldersPage } from "../pages/MediaFoldersPage";
 import { MediaPage } from "../pages/MediaPage";
+import { PlaylistDetailPage } from "../pages/PlaylistDetailPage";
+import { PlaylistsPage } from "../pages/PlaylistsPage";
+import { AssignmentsPage } from "../pages/AssignmentsPage";
+import { SyncLogsPage } from "../pages/SyncLogsPage";
 
 export function AppRouter() {
   return (
@@ -23,6 +27,11 @@ export function AppRouter() {
         <Route path="/devices" element={<DevicesPage />} />
         <Route path="/media-folders" element={<MediaFoldersPage />} />
         <Route path="/media" element={<MediaPage />} />
+        <Route path="/playlists" element={<PlaylistsPage />} />
+        <Route path="/playlists/:playlistId" element={<PlaylistDetailPage />}
+        />
+        <Route path="/assignments" element={<AssignmentsPage />} />
+        <Route path="/sync-logs" element={<SyncLogsPage />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />
