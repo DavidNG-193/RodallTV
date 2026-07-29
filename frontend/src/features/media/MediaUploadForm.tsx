@@ -9,6 +9,7 @@ import type { UploadMediaRequest } from "./media.types";
 
 interface MediaUploadFormProps {
   folders: MediaFolder[];
+  initialFolderId?: string | null;
   isSubmitting: boolean;
   onSubmit: (
     request: UploadMediaRequest,
@@ -27,6 +28,7 @@ const allowedExtensions = [
 
 export function MediaUploadForm({
   folders,
+  initialFolderId = null,
   isSubmitting,
   onSubmit,
   onCancel,
@@ -37,7 +39,7 @@ export function MediaUploadForm({
   const [
     mediaFolderId,
     setMediaFolderId,
-  ] = useState("");
+  ] = useState(initialFolderId ?? "");
 
   const previewUrl = useMemo(() => {
     if (

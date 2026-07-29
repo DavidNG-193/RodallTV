@@ -123,6 +123,16 @@ public class MediaFolderService
             return false;
         }
 
+        var mediaFiles = await _context.MediaFiles
+            .Where(media => media.MediaFolderId == id)
+            .ToListAsync();
+
+        foreach (var media in mediaFiles)
+        {
+            media.MediaFolderId = null;
+            media.MediaFolder = null;
+        }
+
         folder.IsActive = false;
         await _context.SaveChangesAsync();
         return true;

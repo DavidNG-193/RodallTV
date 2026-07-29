@@ -1,5 +1,4 @@
 import {
-  Clapperboard,
   FolderOpen,
   LayoutDashboard,
   Link2,
@@ -21,8 +20,7 @@ interface SidebarLink {
 const links: SidebarLink[] = [
   { to: "/", label: "Resumen", icon: LayoutDashboard, end: true },
   { to: "/devices", label: "Dispositivos", icon: Monitor },
-  { to: "/media-folders", label: "Carpetas", icon: FolderOpen },
-  { to: "/media", label: "Multimedia", icon: Clapperboard },
+  { to: "/media", label: "Archivos", icon: FolderOpen },
   { to: "/playlists", label: "Playlists", icon: ListVideo },
   { to: "/assignments", label: "Asignaciones", icon: Link2 },
   { to: "/sync-logs", label: "Sincronizaciones", icon: ScrollText },
