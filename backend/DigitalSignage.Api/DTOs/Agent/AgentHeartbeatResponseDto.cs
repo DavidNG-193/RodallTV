@@ -14,4 +14,6 @@ public class AgentHeartbeatResponseDto
     public string Status { get; set; } = string.Empty;
 
     public int CurrentPlaylistVersion { get; set; }
+
+    public PendingPowerCommandDto? PendingPowerCommand { get; set; }
 }

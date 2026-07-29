@@ -2,6 +2,7 @@ using System.Security.Cryptography;
 using DigitalSignage.Api.Data;
 using DigitalSignage.Api.DTOs.Devices;
 using DigitalSignage.Api.Entities;
+using DigitalSignage.Api.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace DigitalSignage.Api.Services;
@@ -168,6 +169,74 @@ public class DeviceService
         await _context.SaveChangesAsync();
 
         return true;
+    }
+
+    public async Task<SendPowerCommandResponseDto> SendPowerCommandAsync(
+        Guid deviceId,
+        SendPowerCommandRequestDto request)
+    {
+        var device = await _context.Devices
+            .AsNoTracking()
+            .FirstOrDefaultAsync(item => item.Id == deviceId);
+
+        if (device is null)
+        {
+            throw new KeyNotFoundException("El dispositivo no existe.");
+        }
+
+        if (!device.IsActive)
+        {
+            throw new InvalidOperationException(
+                "No se pueden enviar comandos a un dispositivo inactivo.");
+        }
+
+        if (!Enum.IsDefined(request.CommandType))
+        {
+            throw new ArgumentException(
+                "El comando solicitado no es válido.");
+        }
+
+        if (device.PendingPowerCommandId.HasValue)
+        {
+            throw new InvalidOperationException(
+                "El dispositivo ya tiene una orden de energía pendiente.");
+        }
+
+        var commandId = Guid.NewGuid();
+        var requestedAt = DateTime.UtcNow;
+
+        var updatedRows = await _context.Devices
+            .Where(item =>
+                item.Id == deviceId &&
+                item.IsActive &&
+                item.PendingPowerCommandId == null)
+            .ExecuteUpdateAsync(setters => setters
+                .SetProperty(
+                    item => item.PendingPowerCommandId,
+                    commandId)
+                .SetProperty(
+                    item => item.PendingPowerCommandType,
+                    request.CommandType)
+                .SetProperty(
+                    item => item.PendingPowerCommandRequestedAt,
+                    requestedAt));
+
+        if (updatedRows == 0)
+        {
+            throw new InvalidOperationException(
+                "El dispositivo ya tiene una orden de energía pendiente.");
+        }
+
+        return new SendPowerCommandResponseDto
+        {
+            CommandId = commandId,
+            DeviceId = device.Id,
+            CommandType = request.CommandType,
+            RequestedAt = requestedAt,
+            Message = request.CommandType == PowerCommandType.Restart
+                ? "La orden de reinicio fue registrada."
+                : "La orden de apagado fue registrada."
+        };
     }
 
     private static string GenerateAccessToken()

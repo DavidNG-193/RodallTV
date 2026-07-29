@@ -4,6 +4,8 @@ import type {
   CreateDeviceResponse,
   Device,
   DeviceListFilter,
+  PowerCommandType,
+  SendPowerCommandResponse,
   UpdateDeviceRequest,
 } from "./devices.types";
 
@@ -51,6 +53,19 @@ export const devicesService = {
     const response = await httpClient.patch<Device>(
       `/api/Devices/${id}/reactivate`,
     );
+
+    return response.data;
+  },
+
+  async sendPowerCommand(
+    deviceId: string,
+    commandType: PowerCommandType,
+  ): Promise<SendPowerCommandResponse> {
+    const response =
+      await httpClient.post<SendPowerCommandResponse>(
+        `/api/Devices/${deviceId}/power-command`,
+        { commandType },
+      );
 
     return response.data;
   },

@@ -2,17 +2,17 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 from pathlib import Path
+import logging
 from typing import Any
 
 import requests
-import logging
-from datetime import datetime, timezone
 
 from .config import Settings
-from .models import Manifest
+from .models import HeartbeatResponse, Manifest
 
 
 logger = logging.getLogger(__name__)
+
 
 def to_utc_iso(value: datetime) -> str:
     if value.tzinfo is None:
@@ -24,6 +24,7 @@ def to_utc_iso(value: datetime) -> str:
         .replace("+00:00", "Z")
     )
 
+
 class AgentApiClient:
     def __init__(self, settings: Settings) -> None:
         self._settings = settings
@@ -34,14 +35,28 @@ class AgentApiClient:
             "Accept": "application/json",
         })
 
-    def heartbeat(self) -> dict[str, Any]:
+    def heartbeat(self) -> HeartbeatResponse:
         response = self._session.post(
             f"{self._settings.api_base_url}/api/agent/heartbeat",
             json={"agentVersion": self._settings.agent_version},
             timeout=self._settings.request_timeout_seconds,
         )
         response.raise_for_status()
-        return response.json()
+        return HeartbeatResponse.from_dict(response.json())
+
+    def acknowledge_power_command(self, command_id: str) -> None:
+        response = self._session.post(
+            (
+                f"{self._settings.api_base_url}"
+                "/api/agent/power-command/acknowledge"
+            ),
+            json={"commandId": command_id},
+            timeout=self._settings.request_timeout_seconds,
+        )
+        response.raise_for_status()
+
+    def close(self) -> None:
+        self._session.close()
 
     def get_assignment(self) -> dict[str, Any]:
         response = self._session.get(

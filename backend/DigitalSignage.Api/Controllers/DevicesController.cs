@@ -141,4 +141,31 @@ public class DevicesController : ControllerBase
 
         return Ok(device);
     }
+
+    [HttpPost("{deviceId:guid}/power-command")]
+    public async Task<ActionResult<SendPowerCommandResponseDto>> SendPowerCommand(
+        Guid deviceId,
+        [FromBody] SendPowerCommandRequestDto request)
+    {
+        try
+        {
+            var result = await _deviceService.SendPowerCommandAsync(
+                deviceId,
+                request);
+
+            return Ok(result);
+        }
+        catch (KeyNotFoundException exception)
+        {
+            return NotFound(new { message = exception.Message });
+        }
+        catch (ArgumentException exception)
+        {
+            return BadRequest(new { message = exception.Message });
+        }
+        catch (InvalidOperationException exception)
+        {
+            return Conflict(new { message = exception.Message });
+        }
+    }
 }

@@ -3,6 +3,7 @@ using System;
 using DigitalSignage.Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DigitalSignage.Api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260727171922_RemovePlaylistAssignmentHistoryUniqueIndex")]
+    partial class RemovePlaylistAssignmentHistoryUniqueIndex
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -80,19 +83,6 @@ namespace DigitalSignage.Api.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)")
                         .HasColumnName("name");
-
-                    b.Property<Guid?>("PendingPowerCommandId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("pending_power_command_id");
-
-                    b.Property<DateTime?>("PendingPowerCommandRequestedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("pending_power_command_requested_at");
-
-                    b.Property<string>("PendingPowerCommandType")
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)")
-                        .HasColumnName("pending_power_command_type");
 
                     b.Property<string>("Status")
                         .IsRequired()

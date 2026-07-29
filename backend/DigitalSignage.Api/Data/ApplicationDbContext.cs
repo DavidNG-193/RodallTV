@@ -122,6 +122,17 @@ public class ApplicationDbContext : DbContext
             entity.Property(d => d.LastSyncAt)
                 .HasColumnName("last_sync_at");
 
+            entity.Property(d => d.PendingPowerCommandId)
+                .HasColumnName("pending_power_command_id");
+
+            entity.Property(d => d.PendingPowerCommandType)
+                .HasColumnName("pending_power_command_type")
+                .HasConversion<string>()
+                .HasMaxLength(20);
+
+            entity.Property(d => d.PendingPowerCommandRequestedAt)
+                .HasColumnName("pending_power_command_requested_at");
+
             entity.Property(d => d.IsActive)
                 .HasColumnName("is_active")
                 .IsRequired();
@@ -379,9 +390,6 @@ public class ApplicationDbContext : DbContext
             entity.Property(e => e.IsActive)
                 .HasColumnName("is_active")
                 .IsRequired();
-
-            entity.HasIndex(e => new { e.DeviceId, e.PlaylistId, e.IsActive })
-                .IsUnique();
 
             entity.HasIndex(e => e.DeviceId);
             entity.HasIndex(e => e.PlaylistId);

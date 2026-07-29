@@ -1,6 +1,7 @@
 using DigitalSignage.Api.Data;
 using DigitalSignage.Api.DTOs.Agent;
 using DigitalSignage.Api.Entities;
+using DigitalSignage.Api.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace DigitalSignage.Api.Services;
@@ -56,8 +57,43 @@ public class AgentService
             DeviceName = device.Name,
             ServerTimeUtc = now,
             Status = device.Status,
-            CurrentPlaylistVersion = device.CurrentPlaylistVersion
+            CurrentPlaylistVersion = device.CurrentPlaylistVersion,
+            PendingPowerCommand =
+                device.PendingPowerCommandId.HasValue &&
+                device.PendingPowerCommandType.HasValue &&
+                device.PendingPowerCommandRequestedAt.HasValue
+                    ? new PendingPowerCommandDto
+                    {
+                        CommandId = device.PendingPowerCommandId.Value,
+                        CommandType = device.PendingPowerCommandType.Value,
+                        RequestedAt =
+                            device.PendingPowerCommandRequestedAt.Value
+                    }
+                    : null
         };
+    }
+
+    public async Task AcknowledgePowerCommandAsync(
+        Device device,
+        Guid commandId,
+        CancellationToken cancellationToken = default)
+    {
+        if (!device.PendingPowerCommandId.HasValue)
+        {
+            return;
+        }
+
+        if (device.PendingPowerCommandId.Value != commandId)
+        {
+            throw new InvalidOperationException(
+                "La orden confirmada no coincide con la orden pendiente.");
+        }
+
+        device.PendingPowerCommandId = null;
+        device.PendingPowerCommandType = null;
+        device.PendingPowerCommandRequestedAt = null;
+
+        await _context.SaveChangesAsync(cancellationToken);
     }
 
     public async Task<AgentAssignmentResponseDto> GetAssignmentAsync(

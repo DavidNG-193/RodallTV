@@ -5,6 +5,59 @@ from typing import Any
 
 
 @dataclass(frozen=True)
+class PendingPowerCommand:
+    command_id: str
+    command_type: str
+    requested_at: str
+
+    @classmethod
+    def from_dict(
+        cls,
+        data: dict[str, Any],
+    ) -> "PendingPowerCommand":
+        return cls(
+            command_id=str(data.get("commandId", "")),
+            command_type=str(data.get("commandType", "")),
+            requested_at=str(data.get("requestedAt", "")),
+        )
+
+
+@dataclass(frozen=True)
+class HeartbeatResponse:
+    device_id: str
+    device_uuid: str
+    device_name: str
+    server_time_utc: str
+    status: str
+    current_playlist_version: int
+    pending_power_command: PendingPowerCommand | None
+
+    @classmethod
+    def from_dict(
+        cls,
+        data: dict[str, Any],
+    ) -> "HeartbeatResponse":
+        pending_data = data.get("pendingPowerCommand")
+        pending_command = (
+            PendingPowerCommand.from_dict(pending_data)
+            if isinstance(pending_data, dict)
+            else None
+        )
+
+        return cls(
+            device_id=str(data.get("deviceId", "")),
+            device_uuid=str(data.get("deviceUuid", "")),
+            device_name=str(data.get("deviceName", "")),
+            server_time_utc=str(data.get("serverTimeUtc", "")),
+            status=str(data.get("status", "")),
+            current_playlist_version=int(
+                data.get("currentPlaylistVersion", 0)
+            ),
+            pending_power_command=pending_command,
+        )
+
+
+@dataclass(frozen=True)
 class ManifestItem:
     playlist_item_id: str
     media_id: str

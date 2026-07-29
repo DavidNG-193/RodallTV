@@ -7,6 +7,8 @@ export type DeviceStatus =
 
 export type DeviceListFilter = "active" | "inactive" | "all";
 
+export type PowerCommandType = "Restart" | "Shutdown";
+
 export interface Device {
   id: string;
   deviceUuid: string;
@@ -34,4 +36,12 @@ export interface CreateDeviceResponse extends Device {
 export interface UpdateDeviceRequest {
   name: string;
   location?: string | null;
+}
+
+export interface SendPowerCommandResponse {
+  commandId: string;
+  deviceId: string;
+  commandType: PowerCommandType;
+  requestedAt: string;
+  message: string;
 }

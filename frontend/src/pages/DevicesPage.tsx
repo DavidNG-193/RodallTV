@@ -10,6 +10,7 @@ import { EmptyState } from "../components/common/EmptyState";
 import { LoadingState } from "../components/common/LoadingState";
 import { StatusBadge } from "../components/common/StatusBadge";
 import { DeviceForm } from "../features/devices/DeviceForm";
+import { DevicePowerActions } from "../features/devices/DevicePowerActions";
 import { devicesService } from "../features/devices/devices.service";
 import type {
   CreateDeviceRequest,
@@ -238,6 +239,13 @@ export function DevicesPage() {
             onSubmit={handleSubmit}
             onCancel={closeForm}
           />
+
+          {selectedDevice && (
+            <DevicePowerActions
+              key={`power-${selectedDevice.id}`}
+              device={selectedDevice}
+            />
+          )}
 
           {createdDevice && (
             <div className="token-panel">

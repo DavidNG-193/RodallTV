@@ -1,3 +1,5 @@
+using DigitalSignage.Api.Enums;
+
 namespace DigitalSignage.Api.Entities;
 
 public class Device
@@ -23,6 +25,12 @@ public class Device
     public DateTime? LastConnectionAt { get; set; }
 
     public DateTime? LastSyncAt { get; set; }
+
+    public Guid? PendingPowerCommandId { get; set; }
+
+    public PowerCommandType? PendingPowerCommandType { get; set; }
+
+    public DateTime? PendingPowerCommandRequestedAt { get; set; }
 
     public bool IsActive { get; set; } = true;
 

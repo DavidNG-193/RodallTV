@@ -106,7 +106,7 @@ export function DashboardPage() {
           <p className="page-heading__eyebrow">Resumen</p>
           <h2>Panel principal</h2>
           <p>
-            Consulta el estado general del sistema de Digital Signage.
+            Consulta el estado general del sistema de RodallTV.
           </p>
         </div>
 

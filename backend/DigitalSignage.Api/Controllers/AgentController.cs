@@ -188,6 +188,36 @@ public class AgentController : ControllerBase
         }
     }
 
+    [HttpPost("power-command/acknowledge")]
+    public async Task<IActionResult> AcknowledgePowerCommand(
+        [FromBody] AcknowledgePowerCommandRequestDto request,
+        CancellationToken cancellationToken)
+    {
+        var device = await AuthenticateDeviceAsync(cancellationToken);
+
+        if (device is null)
+        {
+            return Unauthorized(new
+            {
+                message = "Credenciales del dispositivo inválidas."
+            });
+        }
+
+        try
+        {
+            await _agentService.AcknowledgePowerCommandAsync(
+                device,
+                request.CommandId,
+                cancellationToken);
+
+            return NoContent();
+        }
+        catch (InvalidOperationException exception)
+        {
+            return Conflict(new { message = exception.Message });
+        }
+    }
+
     private async Task<Device?> AuthenticateDeviceAsync(
         CancellationToken cancellationToken)
     {
