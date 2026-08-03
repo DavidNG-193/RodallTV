@@ -28,3 +28,14 @@ media_storage/
 # Uploaded media files
 backend/DigitalSignage.Api/Storage/Media/*
 !backend/DigitalSignage.Api/Storage/Media/.gitkeep
+
+# RodallTV signage application
+signage-app/.venv/
+signage-app/.env
+signage-app/runtime/cache/*
+signage-app/runtime/logs/*
+!signage-app/runtime/cache/.gitkeep
+!signage-app/runtime/logs/.gitkeep
+signage-app/__pycache__/
+signage-app/**/__pycache__/
+*.pyc
