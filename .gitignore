@@ -39,3 +39,8 @@ signage-app/runtime/logs/*
 signage-app/__pycache__/
 signage-app/**/__pycache__/
 *.pyc
+
+signage-app/runtime/content/*
+!signage-app/runtime/content/.gitkeep
+signage-app/runtime/cache/active_manifest.json
+signage-app/runtime/cache/*.tmp
