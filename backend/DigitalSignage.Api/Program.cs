@@ -2,12 +2,20 @@ using DigitalSignage.Api.Data;
 using Microsoft.EntityFrameworkCore;
 using DigitalSignage.Api.Seeders;
 using DigitalSignage.Api.Services;
+using DigitalSignage.Api.Services.ExchangeRates;
+using DigitalSignage.Api.Configuration;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Http.Features;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Evita que Windows Event Log convierta un fallo externo controlable en una
+// conexión abortada cuando la cuenta del proceso no tiene permisos de escritura.
+// Console funciona tanto en desarrollo como bajo systemd en Raspberry/Linux.
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
 
 builder.Services.AddControllers();
 
@@ -26,6 +34,8 @@ builder.Services.AddScoped<PlaylistAssignmentService>();
 builder.Services.AddScoped<SyncLogService>();
 builder.Services.AddScoped<DeviceAuthenticationService>();
 builder.Services.AddScoped<AgentService>();
+builder.Services.AddScoped<IDeviceExchangeRateSettingsService, DeviceExchangeRateSettingsService>();
+builder.Services.AddScoped<IAgentExchangeRateService, AgentExchangeRateService>();
 
 // Authentication - JWT
 builder.Services.AddAuthentication(options =>
@@ -78,6 +88,26 @@ builder.Services.AddCors(options =>
             .AllowAnyHeader()
             .AllowAnyMethod();
     });
+});
+
+
+builder.Services.Configure<BanxicoOptions>(
+    builder.Configuration.GetSection(BanxicoOptions.SectionName));
+
+builder.Services.AddMemoryCache();
+
+builder.Services.AddHttpClient<
+    IExchangeRateProvider,
+    BanxicoExchangeRateProvider>((serviceProvider, client) =>
+{
+    BanxicoOptions options = serviceProvider
+        .GetRequiredService<
+            Microsoft.Extensions.Options.IOptions<BanxicoOptions>>()
+        .Value;
+
+    client.BaseAddress = new Uri(options.BaseUrl);
+    client.Timeout = TimeSpan.FromSeconds(
+        options.RequestTimeoutSeconds);
 });
 
 var app = builder.Build();

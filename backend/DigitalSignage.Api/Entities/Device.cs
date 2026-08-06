@@ -35,4 +35,6 @@ public class Device
     public bool IsActive { get; set; } = true;
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+    public ICollection<DeviceExchangeRateSetting> ExchangeRateSettings { get; set; } = new List<DeviceExchangeRateSetting>();
 }

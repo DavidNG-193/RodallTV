@@ -1,4 +1,5 @@
 using System.Security.Cryptography;
+using DigitalSignage.Api.Configuration;
 using DigitalSignage.Api.Data;
 using DigitalSignage.Api.DTOs.Devices;
 using DigitalSignage.Api.Entities;
@@ -64,6 +65,7 @@ public class DeviceService
 
         var accessToken = GenerateAccessToken();
 
+        var now = DateTime.UtcNow;
         var device = new Device
         {
             Id = Guid.NewGuid(),
@@ -74,8 +76,29 @@ public class DeviceService
             Status = "NotSynced",
             CurrentPlaylistVersion = 0,
             IsActive = true,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = now
         };
+
+        var defaultSeries = ExchangeRateSeriesCatalog.GetDefaults();
+
+        for (var index = 0; index < defaultSeries.Count; index++)
+        {
+            var definition = defaultSeries[index];
+
+            device.ExchangeRateSettings.Add(
+                new DeviceExchangeRateSetting
+                {
+                    Id = Guid.NewGuid(),
+                    DeviceId = device.Id,
+                    SeriesId = definition.SeriesId,
+                    DisplayName = definition.DefaultDisplayName,
+                    Unit = definition.Unit,
+                    Position = index + 1,
+                    IsActive = true,
+                    CreatedAt = now,
+                    UpdatedAt = now
+                });
+        }
 
         _context.Devices.Add(device);
         await _context.SaveChangesAsync();

@@ -1,6 +1,7 @@
 using DigitalSignage.Api.DTOs.Agent;
 using DigitalSignage.Api.Entities;
 using DigitalSignage.Api.Services;
+using DigitalSignage.Api.Services.ExchangeRates;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,16 +17,58 @@ public class AgentController : ControllerBase
 
     private readonly DeviceAuthenticationService _authenticationService;
     private readonly AgentService _agentService;
+    private readonly IAgentExchangeRateService _exchangeRateService;
     private readonly IWebHostEnvironment _environment;
+    private readonly ILogger<AgentController> _logger;
 
     public AgentController(
         DeviceAuthenticationService authenticationService,
         AgentService agentService,
-        IWebHostEnvironment environment)
+        IAgentExchangeRateService exchangeRateService,
+        IWebHostEnvironment environment,
+        ILogger<AgentController> logger)
     {
         _authenticationService = authenticationService;
         _agentService = agentService;
+        _exchangeRateService = exchangeRateService;
         _environment = environment;
+        _logger = logger;
+    }
+
+    [HttpGet("exchange-rates")]
+    public async Task<ActionResult<AgentExchangeRatesResponseDto>>
+        GetExchangeRates(CancellationToken cancellationToken)
+    {
+        var device = await AuthenticateDeviceAsync(cancellationToken);
+
+        if (device is null)
+        {
+            return Unauthorized(new
+            {
+                message = "Credenciales del dispositivo inválidas."
+            });
+        }
+
+        try
+        {
+            var response = await _exchangeRateService.GetForDeviceAsync(
+                device.Id,
+                cancellationToken);
+
+            return Ok(response);
+        }
+        catch (ExchangeRateUnavailableException exception)
+        {
+            _logger.LogWarning(
+                exception,
+                "Las tasas no están disponibles para el dispositivo {DeviceId}.",
+                device.Id);
+
+            return StatusCode(StatusCodes.Status503ServiceUnavailable, new
+            {
+                message = "Las tasas de cambio no están disponibles temporalmente."
+            });
+        }
     }
 
     [HttpPost("heartbeat")]

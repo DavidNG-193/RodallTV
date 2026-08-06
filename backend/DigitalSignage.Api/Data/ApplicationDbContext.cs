@@ -19,6 +19,8 @@ public class ApplicationDbContext : DbContext
     public DbSet<PlaylistAssignment> PlaylistAssignments { get; set; }
     public DbSet<SyncLog> SyncLogs { get; set; }
 
+    public DbSet<DeviceExchangeRateSetting> DeviceExchangeRateSettings => Set<DeviceExchangeRateSetting>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -446,6 +448,62 @@ public class ApplicationDbContext : DbContext
                 .WithMany()
                 .HasForeignKey(e => e.PlaylistId)
                 .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<DeviceExchangeRateSetting>(entity =>
+        {
+            entity.ToTable("device_exchange_rate_settings");
+
+            entity.HasKey(x => x.Id);
+
+            entity.Property(x => x.Id)
+                .HasColumnName("id");
+
+            entity.Property(x => x.DeviceId)
+                .HasColumnName("device_id")
+                .IsRequired();
+
+            entity.Property(x => x.SeriesId)
+                .HasColumnName("series_id")
+                .HasMaxLength(30)
+                .IsRequired();
+
+            entity.Property(x => x.DisplayName)
+                .HasColumnName("display_name")
+                .HasMaxLength(80)
+                .IsRequired();
+
+            entity.Property(x => x.Unit)
+                .HasColumnName("unit")
+                .HasMaxLength(20)
+                .IsRequired();
+
+            entity.Property(x => x.Position)
+                .HasColumnName("position")
+                .IsRequired();
+
+            entity.Property(x => x.IsActive)
+                .HasColumnName("is_active")
+                .IsRequired();
+
+            entity.Property(x => x.CreatedAt)
+                .HasColumnName("created_at")
+                .IsRequired();
+
+            entity.Property(x => x.UpdatedAt)
+                .HasColumnName("updated_at")
+                .IsRequired();
+
+            entity.HasOne(x => x.Device)
+                .WithMany(x => x.ExchangeRateSettings)
+                .HasForeignKey(x => x.DeviceId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(x => new { x.DeviceId, x.SeriesId })
+                .IsUnique();
+
+            entity.HasIndex(x => new { x.DeviceId, x.Position })
+                .IsUnique();
         });
     }
 }
