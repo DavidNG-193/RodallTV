@@ -123,9 +123,9 @@ public class SyncLogService
             StartedAt = startedAt,
             FinishedAt = request.FinishedAt,
             Result = result,
-            Message = string.IsNullOrWhiteSpace(request.Message)
-                ? null
-                : request.Message.Trim(),
+            Message = SyncStatusMessageNormalizer.Normalize(
+                result,
+                request.Message),
             DownloadedFilesCount = request.DownloadedFilesCount,
             DeletedFilesCount = request.DeletedFilesCount
         };

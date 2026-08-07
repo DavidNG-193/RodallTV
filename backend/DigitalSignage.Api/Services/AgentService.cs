@@ -259,13 +259,8 @@ public class AgentService
                 device.Status = "Error";
                 break;
             case "NoChanges":
-                if (!string.Equals(
-                        device.Status,
-                        "Error",
-                        StringComparison.OrdinalIgnoreCase))
-                {
-                    device.Status = "Online";
-                }
+                device.LastSyncAt = now;
+                device.Status = "Online";
                 break;
         }
 
@@ -278,7 +273,9 @@ public class AgentService
             StartedAt = request.StartedAt,
             FinishedAt = request.FinishedAt,
             Result = normalizedResult,
-            Message = request.Message,
+            Message = SyncStatusMessageNormalizer.Normalize(
+                normalizedResult,
+                request.Message),
             DownloadedFilesCount = request.DownloadedFilesCount,
             DeletedFilesCount = request.DeletedFilesCount
         };
