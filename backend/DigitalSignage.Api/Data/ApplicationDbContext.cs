@@ -18,8 +18,8 @@ public class ApplicationDbContext : DbContext
     public DbSet<PlaylistItem> PlaylistItems { get; set; }
     public DbSet<PlaylistAssignment> PlaylistAssignments { get; set; }
     public DbSet<SyncLog> SyncLogs { get; set; }
-
     public DbSet<DeviceExchangeRateSetting> DeviceExchangeRateSettings => Set<DeviceExchangeRateSetting>();
+    public DbSet<DeviceWeatherSetting> DeviceWeatherSettings => Set<DeviceWeatherSetting>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -503,6 +503,58 @@ public class ApplicationDbContext : DbContext
                 .IsUnique();
 
             entity.HasIndex(x => new { x.DeviceId, x.Position })
+                .IsUnique();
+        });
+
+        modelBuilder.Entity<DeviceWeatherSetting>(entity =>
+        {
+            entity.ToTable("device_weather_settings");
+
+            entity.HasKey(x => x.Id);
+
+            entity.Property(x => x.Id)
+                .HasColumnName("id");
+
+            entity.Property(x => x.DeviceId)
+                .HasColumnName("device_id")
+                .IsRequired();
+
+            entity.Property(x => x.LocationName)
+                .HasColumnName("location_name")
+                .HasMaxLength(120)
+                .IsRequired();
+
+            entity.Property(x => x.Latitude)
+                .HasColumnName("latitude")
+                .IsRequired();
+
+            entity.Property(x => x.Longitude)
+                .HasColumnName("longitude")
+                .IsRequired();
+
+            entity.Property(x => x.Timezone)
+                .HasColumnName("timezone")
+                .HasMaxLength(80)
+                .IsRequired();
+
+            entity.Property(x => x.IsActive)
+                .HasColumnName("is_active")
+                .IsRequired();
+
+            entity.Property(x => x.CreatedAt)
+                .HasColumnName("created_at")
+                .IsRequired();
+
+            entity.Property(x => x.UpdatedAt)
+                .HasColumnName("updated_at")
+                .IsRequired();
+
+            entity.HasOne(x => x.Device)
+                .WithOne(x => x.WeatherSetting)
+                .HasForeignKey<DeviceWeatherSetting>(x => x.DeviceId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(x => x.DeviceId)
                 .IsUnique();
         });
     }

@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using DigitalSignage.Api.Seeders;
 using DigitalSignage.Api.Services;
 using DigitalSignage.Api.Services.ExchangeRates;
+using DigitalSignage.Api.Services.Weather;
 using DigitalSignage.Api.Configuration;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -36,6 +37,9 @@ builder.Services.AddScoped<DeviceAuthenticationService>();
 builder.Services.AddScoped<AgentService>();
 builder.Services.AddScoped<IDeviceExchangeRateSettingsService, DeviceExchangeRateSettingsService>();
 builder.Services.AddScoped<IAgentExchangeRateService, AgentExchangeRateService>();
+builder.Services.AddScoped<
+    IDeviceWeatherSettingsService,
+    DeviceWeatherSettingsService>();
 
 // Authentication - JWT
 builder.Services.AddAuthentication(options =>
@@ -110,6 +114,41 @@ builder.Services.AddHttpClient<
         options.RequestTimeoutSeconds);
 });
 
+builder.Services.AddOptions<WeatherOptions>()
+    .Bind(builder.Configuration.GetSection(WeatherOptions.SectionName))
+    .Validate(
+        options => options.CacheMinutes > 0,
+        "Weather:CacheMinutes debe ser mayor que cero.")
+    .Validate(
+        options => options.RequestTimeoutSeconds > 0,
+        "Weather:RequestTimeoutSeconds debe ser mayor que cero.")
+    .Validate(
+        options =>
+            !string.IsNullOrWhiteSpace(options.DefaultSetting.LocationName) &&
+            options.DefaultSetting.Latitude is >= -90 and <= 90 &&
+            options.DefaultSetting.Longitude is >= -180 and <= 180 &&
+            !string.IsNullOrWhiteSpace(options.DefaultSetting.Timezone),
+        "Weather:DefaultSetting contiene datos inválidos.")
+    .ValidateOnStart();
+
+builder.Services.AddScoped<
+    IAgentWeatherService,
+    AgentWeatherService>();
+
+builder.Services.AddHttpClient<
+    IWeatherProvider,
+    OpenMeteoWeatherProvider>((serviceProvider, client) =>
+{
+    WeatherOptions options = serviceProvider
+        .GetRequiredService<
+            Microsoft.Extensions.Options.IOptions<WeatherOptions>>()
+        .Value;
+
+    client.BaseAddress = new Uri(options.BaseUrl);
+    client.Timeout = TimeSpan.FromSeconds(
+        options.RequestTimeoutSeconds);
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -130,7 +169,11 @@ app.MapControllers();
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    await DatabaseSeeder.SeedAsync(context);
+    var weatherOptions = scope.ServiceProvider
+        .GetRequiredService<
+            Microsoft.Extensions.Options.IOptions<WeatherOptions>>()
+        .Value;
+    await DatabaseSeeder.SeedAsync(context, weatherOptions);
 }
 
 app.Run();

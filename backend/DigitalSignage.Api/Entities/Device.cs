@@ -37,4 +37,6 @@ public class Device
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     public ICollection<DeviceExchangeRateSetting> ExchangeRateSettings { get; set; } = new List<DeviceExchangeRateSetting>();
+
+    public DeviceWeatherSetting? WeatherSetting { get; set; }
 }

@@ -2,6 +2,7 @@ using DigitalSignage.Api.DTOs.Agent;
 using DigitalSignage.Api.Entities;
 using DigitalSignage.Api.Services;
 using DigitalSignage.Api.Services.ExchangeRates;
+using DigitalSignage.Api.Services.Weather;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,6 +19,7 @@ public class AgentController : ControllerBase
     private readonly DeviceAuthenticationService _authenticationService;
     private readonly AgentService _agentService;
     private readonly IAgentExchangeRateService _exchangeRateService;
+    private readonly IAgentWeatherService _weatherService;
     private readonly IWebHostEnvironment _environment;
     private readonly ILogger<AgentController> _logger;
 
@@ -25,14 +27,52 @@ public class AgentController : ControllerBase
         DeviceAuthenticationService authenticationService,
         AgentService agentService,
         IAgentExchangeRateService exchangeRateService,
+        IAgentWeatherService weatherService,
         IWebHostEnvironment environment,
         ILogger<AgentController> logger)
     {
         _authenticationService = authenticationService;
         _agentService = agentService;
         _exchangeRateService = exchangeRateService;
+        _weatherService = weatherService;
         _environment = environment;
         _logger = logger;
+    }
+
+    [HttpGet("weather")]
+    public async Task<ActionResult<AgentWeatherResponseDto>> GetWeather(
+        CancellationToken cancellationToken)
+    {
+        var device = await AuthenticateDeviceAsync(cancellationToken);
+
+        if (device is null)
+        {
+            return Unauthorized(new
+            {
+                message = "Credenciales del dispositivo inválidas."
+            });
+        }
+
+        try
+        {
+            var response = await _weatherService.GetForDeviceAsync(
+                device.Id,
+                cancellationToken);
+
+            return Ok(response);
+        }
+        catch (WeatherUnavailableException exception)
+        {
+            _logger.LogWarning(
+                exception,
+                "El clima no está disponible para el dispositivo {DeviceId}.",
+                device.Id);
+
+            return StatusCode(StatusCodes.Status503ServiceUnavailable, new
+            {
+                message = "El clima no está disponible temporalmente."
+            });
+        }
     }
 
     [HttpGet("exchange-rates")]

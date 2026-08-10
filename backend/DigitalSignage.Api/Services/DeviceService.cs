@@ -5,16 +5,21 @@ using DigitalSignage.Api.DTOs.Devices;
 using DigitalSignage.Api.Entities;
 using DigitalSignage.Api.Enums;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace DigitalSignage.Api.Services;
 
 public class DeviceService
 {
     private readonly ApplicationDbContext _context;
+    private readonly WeatherOptions _weatherOptions;
 
-    public DeviceService(ApplicationDbContext context)
+    public DeviceService(
+        ApplicationDbContext context,
+        IOptions<WeatherOptions> weatherOptions)
     {
         _context = context;
+        _weatherOptions = weatherOptions.Value;
     }
 
     public async Task<List<DeviceResponseDto>> GetAllAsync(
@@ -80,6 +85,11 @@ public class DeviceService
         };
 
         var defaultSeries = ExchangeRateSeriesCatalog.GetDefaults();
+
+        device.WeatherSetting = CreateDefaultWeatherSetting(
+            device.Id,
+            now,
+            _weatherOptions.DefaultSetting);
 
         for (var index = 0; index < defaultSeries.Count; index++)
         {
@@ -267,6 +277,25 @@ public class DeviceService
         var tokenBytes = RandomNumberGenerator.GetBytes(32);
 
         return Convert.ToHexString(tokenBytes);
+    }
+
+    private static DeviceWeatherSetting CreateDefaultWeatherSetting(
+        Guid deviceId,
+        DateTime now,
+        WeatherDefaultSettingOptions defaults)
+    {
+        return new DeviceWeatherSetting
+        {
+            Id = Guid.NewGuid(),
+            DeviceId = deviceId,
+            LocationName = defaults.LocationName.Trim(),
+            Latitude = defaults.Latitude,
+            Longitude = defaults.Longitude,
+            Timezone = defaults.Timezone.Trim(),
+            IsActive = defaults.IsActive,
+            CreatedAt = now,
+            UpdatedAt = now
+        };
     }
 
     private static DeviceResponseDto MapToResponseDto(Device device)
