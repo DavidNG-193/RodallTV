@@ -20,6 +20,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<SyncLog> SyncLogs { get; set; }
     public DbSet<DeviceExchangeRateSetting> DeviceExchangeRateSettings => Set<DeviceExchangeRateSetting>();
     public DbSet<DeviceWeatherSetting> DeviceWeatherSettings => Set<DeviceWeatherSetting>();
+    public DbSet<DailyReference> DailyReferences => Set<DailyReference>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -556,6 +557,68 @@ public class ApplicationDbContext : DbContext
 
             entity.HasIndex(x => x.DeviceId)
                 .IsUnique();
+        });
+
+        modelBuilder.Entity<DailyReference>(entity =>
+        {
+            entity.ToTable("daily_references");
+            entity.HasKey(x => x.Id);
+
+            entity.Property(x => x.Id).HasColumnName("id");
+            entity.Property(x => x.ReferenceNumber)
+                .HasColumnName("reference_number")
+                .HasMaxLength(50)
+                .IsRequired();
+            entity.Property(x => x.ReferenceDate)
+                .HasColumnName("reference_date")
+                .IsRequired();
+            entity.Property(x => x.Client)
+                .HasColumnName("client")
+                .HasMaxLength(200)
+                .IsRequired();
+            entity.Property(x => x.OperationCode)
+                .HasColumnName("operation_code")
+                .HasMaxLength(5)
+                .IsRequired();
+            entity.Property(x => x.OperationDisplayName)
+                .HasColumnName("operation_display_name")
+                .HasMaxLength(30)
+                .IsRequired();
+            entity.Property(x => x.Document)
+                .HasColumnName("document")
+                .HasMaxLength(30)
+                .IsRequired();
+            entity.Property(x => x.CustomsOfficeNumber)
+                .HasColumnName("customs_office_number")
+                .IsRequired();
+            entity.Property(x => x.CustomsOffice)
+                .HasColumnName("customs_office")
+                .HasMaxLength(200)
+                .IsRequired();
+            entity.Property(x => x.StatusCode)
+                .HasColumnName("status_code")
+                .HasMaxLength(20)
+                .IsRequired();
+            entity.Property(x => x.StatusDescription)
+                .HasColumnName("status_description")
+                .HasMaxLength(200)
+                .IsRequired();
+            entity.Property(x => x.LastExternalUpdateAt)
+                .HasColumnName("last_external_update_at")
+                .IsRequired();
+            entity.Property(x => x.CreatedAt)
+                .HasColumnName("created_at")
+                .IsRequired();
+            entity.Property(x => x.CreatedByUserId)
+                .HasColumnName("created_by_user_id")
+                .IsRequired();
+
+            entity.HasIndex(x => x.ReferenceNumber).IsUnique();
+
+            entity.HasOne(x => x.CreatedByUser)
+                .WithMany()
+                .HasForeignKey(x => x.CreatedByUserId)
+                .OnDelete(DeleteBehavior.Restrict);
         });
     }
 }

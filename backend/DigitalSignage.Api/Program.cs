@@ -4,6 +4,7 @@ using DigitalSignage.Api.Seeders;
 using DigitalSignage.Api.Services;
 using DigitalSignage.Api.Services.ExchangeRates;
 using DigitalSignage.Api.Services.Weather;
+using DigitalSignage.Api.Services.References;
 using DigitalSignage.Api.Configuration;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -147,6 +148,42 @@ builder.Services.AddHttpClient<
     client.BaseAddress = new Uri(options.BaseUrl);
     client.Timeout = TimeSpan.FromSeconds(
         options.RequestTimeoutSeconds);
+});
+
+builder.Services.AddOptions<SagaOptions>()
+    .Bind(builder.Configuration.GetSection(SagaOptions.SectionName))
+    .Validate(
+        options => Uri.TryCreate(
+            options.BaseUrl,
+            UriKind.Absolute,
+            out Uri? baseUri) &&
+            (baseUri.Scheme == Uri.UriSchemeHttp ||
+             baseUri.Scheme == Uri.UriSchemeHttps),
+        "Saga:BaseUrl debe ser una URL HTTP(S) absoluta.")
+    .Validate(
+        options => !string.IsNullOrWhiteSpace(options.ReferencePath),
+        "Saga:ReferencePath es obligatorio.")
+    .Validate(
+        options => options.RequestTimeoutSeconds > 0,
+        "Saga:RequestTimeoutSeconds debe ser mayor que cero.")
+    .Validate(
+        options => options.RefreshMinutes > 0,
+        "Saga:RefreshMinutes debe ser mayor que cero.")
+    .ValidateOnStart();
+
+builder.Services.AddScoped<IDailyReferenceService, DailyReferenceService>();
+builder.Services.AddHostedService<DailyReferenceRefreshBackgroundService>();
+
+builder.Services.AddHttpClient<ISagaReferenceClient, SagaReferenceClient>(
+    (serviceProvider, client) =>
+    {
+        SagaOptions options = serviceProvider
+            .GetRequiredService<
+                Microsoft.Extensions.Options.IOptions<SagaOptions>>()
+            .Value;
+
+        client.BaseAddress = new Uri(options.BaseUrl);
+        client.Timeout = TimeSpan.FromSeconds(options.RequestTimeoutSeconds);
 });
 
 var app = builder.Build();
