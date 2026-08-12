@@ -9,6 +9,7 @@ import { PlaylistDetailPage } from "../pages/PlaylistDetailPage";
 import { PlaylistsPage } from "../pages/PlaylistsPage";
 import { AssignmentsPage } from "../pages/AssignmentsPage";
 import { SyncLogsPage } from "../pages/SyncLogsPage";
+import { DailyReferencesPage } from "../features/references/DailyReferencesPage";
 
 export function AppRouter() {
   return (
@@ -34,6 +35,7 @@ export function AppRouter() {
         />
         <Route path="/assignments" element={<AssignmentsPage />} />
         <Route path="/sync-logs" element={<SyncLogsPage />} />
+        <Route path="/references" element={<DailyReferencesPage />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />

@@ -138,7 +138,11 @@ public sealed class DailyReferencesController : ControllerBase
         CancellationToken cancellationToken)
     {
         int updated = await _service.RefreshAllAsync(cancellationToken);
-        return Ok(new { updated });
+        return Ok(new
+        {
+            refreshedCount = updated,
+            refreshedAtUtc = DateTime.UtcNow
+        });
     }
 
     private ObjectResult SagaUnavailable() =>

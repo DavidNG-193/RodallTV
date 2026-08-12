@@ -5,6 +5,7 @@ import {
   ListVideo,
   Monitor,
   ScrollText,
+  ClipboardList,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { NavLink } from "react-router-dom";
@@ -23,6 +24,7 @@ const links: SidebarLink[] = [
   { to: "/media", label: "Archivos", icon: FolderOpen },
   { to: "/playlists", label: "Playlists", icon: ListVideo },
   { to: "/assignments", label: "Asignaciones", icon: Link2 },
+  { to: "/references", label: "Referencias", icon: ClipboardList },
   { to: "/sync-logs", label: "Sincronizaciones", icon: ScrollText },
 ];
 
