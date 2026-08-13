@@ -3,6 +3,7 @@ using DigitalSignage.Api.Entities;
 using DigitalSignage.Api.Services;
 using DigitalSignage.Api.Services.ExchangeRates;
 using DigitalSignage.Api.Services.Weather;
+using DigitalSignage.Api.Services.References;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,6 +21,7 @@ public class AgentController : ControllerBase
     private readonly AgentService _agentService;
     private readonly IAgentExchangeRateService _exchangeRateService;
     private readonly IAgentWeatherService _weatherService;
+    private readonly IAgentReferenceService _referenceService;
     private readonly IWebHostEnvironment _environment;
     private readonly ILogger<AgentController> _logger;
 
@@ -28,6 +30,7 @@ public class AgentController : ControllerBase
         AgentService agentService,
         IAgentExchangeRateService exchangeRateService,
         IAgentWeatherService weatherService,
+        IAgentReferenceService referenceService,
         IWebHostEnvironment environment,
         ILogger<AgentController> logger)
     {
@@ -35,8 +38,34 @@ public class AgentController : ControllerBase
         _agentService = agentService;
         _exchangeRateService = exchangeRateService;
         _weatherService = weatherService;
+        _referenceService = referenceService;
         _environment = environment;
         _logger = logger;
+    }
+
+    [HttpGet("references")]
+    public async Task<ActionResult<AgentReferencesResponseDto>> GetReferences(
+        CancellationToken cancellationToken)
+    {
+        var device = await AuthenticateDeviceAsync(cancellationToken);
+
+        if (device is null)
+        {
+            return Unauthorized(new
+            {
+                message = "Credenciales del dispositivo inválidas."
+            });
+        }
+
+        AgentReferencesResponseDto response =
+            await _referenceService.GetAllAsync(cancellationToken);
+
+        _logger.LogInformation(
+            "Se entregaron {ReferenceCount} referencias al dispositivo {DeviceId}.",
+            response.References.Count,
+            device.Id);
+
+        return Ok(response);
     }
 
     [HttpGet("weather")]
