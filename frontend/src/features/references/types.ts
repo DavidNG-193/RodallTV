@@ -18,6 +18,9 @@ export type DailyReference = ReferenceLookup & {
 };
 
 export type RefreshReferencesResponse = {
+  totalCount: number;
   refreshedCount: number;
+  notFoundCount: number;
+  failedCount: number;
   refreshedAtUtc: string;
 };

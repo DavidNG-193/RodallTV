@@ -18,5 +18,6 @@ public interface IDailyReferenceService
 
     Task DeleteAsync(Guid id, CancellationToken cancellationToken);
     Task DeleteAllAsync(CancellationToken cancellationToken);
-    Task<int> RefreshAllAsync(CancellationToken cancellationToken);
+    Task<RefreshDailyReferencesResultDto> RefreshAllAsync(
+        CancellationToken cancellationToken);
 }

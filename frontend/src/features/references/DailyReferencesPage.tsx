@@ -25,6 +25,7 @@ export function DailyReferencesPage() {
   const [isDeletingAll, setIsDeletingAll] = useState(false);
   const [loadError, setLoadError] = useState("");
   const [actionError, setActionError] = useState("");
+  const [actionMessage, setActionMessage] = useState("");
   const [confirmation, setConfirmation] = useState<ConfirmationTarget | null>(null);
   const listRequestInFlight = useRef(false);
 
@@ -73,11 +74,31 @@ export function DailyReferencesPage() {
 
     setIsRefreshing(true);
     setActionError("");
+    setActionMessage("");
 
     try {
-      await referencesApi.refreshDailyReferences();
+      const result = await referencesApi.refreshDailyReferences();
       setReferences(await referencesApi.getDailyReferences());
       setLoadError("");
+
+      if (result.failedCount > 0 || result.notFoundCount > 0) {
+        const details = [
+          result.failedCount > 0 ? `${result.failedCount} con error` : "",
+          result.notFoundCount > 0
+            ? `${result.notFoundCount} no encontradas en Saga`
+            : "",
+        ].filter(Boolean).join(" y ");
+
+        setActionError(
+          `Actualización incompleta: ${result.refreshedCount} actualizadas; ${details}.`,
+        );
+      } else {
+        setActionMessage(
+          result.totalCount === 0
+            ? "No hay referencias para actualizar."
+            : `${result.refreshedCount} referencias actualizadas correctamente.`,
+        );
+      }
     } catch (error) {
       setActionError(getReferenceErrorMessage(error, "refresh"));
     } finally {
@@ -160,6 +181,12 @@ export function DailyReferencesPage() {
               Reintentar
             </button>
           )}
+        </div>
+      )}
+
+      {actionMessage && (
+        <div className="alert alert--success references-page__alert" role="status">
+          <span>{actionMessage}</span>
         </div>
       )}
 

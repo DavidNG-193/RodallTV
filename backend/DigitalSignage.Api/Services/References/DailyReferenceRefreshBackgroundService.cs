@@ -24,9 +24,11 @@ public sealed class DailyReferenceRefreshBackgroundService : BackgroundService
         TimeSpan interval = TimeSpan.FromMinutes(
             Math.Max(_options.RefreshMinutes, 1));
 
-        using var timer = new PeriodicTimer(interval);
+        _logger.LogInformation(
+            "Actualización automática de referencias iniciada con intervalo de {RefreshMinutes} minutos.",
+            interval.TotalMinutes);
 
-        while (await timer.WaitForNextTickAsync(stoppingToken))
+        while (!stoppingToken.IsCancellationRequested)
         {
             try
             {
@@ -34,7 +36,17 @@ public sealed class DailyReferenceRefreshBackgroundService : BackgroundService
                 IDailyReferenceService service = scope.ServiceProvider
                     .GetRequiredService<IDailyReferenceService>();
 
-                await service.RefreshAllAsync(stoppingToken);
+                var result = await service.RefreshAllAsync(stoppingToken);
+
+                if (result.FailedCount > 0 || result.NotFoundCount > 0)
+                {
+                    _logger.LogWarning(
+                        "Ciclo automático de referencias incompleto. Total: {TotalCount}, actualizadas: {RefreshedCount}, no encontradas: {NotFoundCount}, fallidas: {FailedCount}.",
+                        result.TotalCount,
+                        result.RefreshedCount,
+                        result.NotFoundCount,
+                        result.FailedCount);
+                }
             }
             catch (OperationCanceledException)
                 when (stoppingToken.IsCancellationRequested)
@@ -46,6 +58,16 @@ public sealed class DailyReferenceRefreshBackgroundService : BackgroundService
                 _logger.LogError(
                     exception,
                     "Falló el ciclo automático de referencias.");
+            }
+
+            try
+            {
+                await Task.Delay(interval, stoppingToken);
+            }
+            catch (OperationCanceledException)
+                when (stoppingToken.IsCancellationRequested)
+            {
+                break;
             }
         }
     }

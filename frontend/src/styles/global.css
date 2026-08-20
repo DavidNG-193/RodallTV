@@ -324,6 +324,12 @@ label {
   border: 1px solid #f6c7c3;
 }
 
+.alert--success {
+  color: #17643a;
+  background: #eaf7ef;
+  border: 1px solid #b9e2c9;
+}
+
 .device-form {
   display: grid;
   grid-template-columns:

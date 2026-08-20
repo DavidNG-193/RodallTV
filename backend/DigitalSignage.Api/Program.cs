@@ -163,6 +163,11 @@ builder.Services.AddOptions<SagaOptions>()
         options => !string.IsNullOrWhiteSpace(options.ReferencePath),
         "Saga:ReferencePath es obligatorio.")
     .Validate(
+        options =>
+            !string.IsNullOrWhiteSpace(options.User) &&
+            !string.IsNullOrWhiteSpace(options.Password),
+        "Saga:User y Saga:Password son obligatorios.")
+    .Validate(
         options => options.RequestTimeoutSeconds > 0,
         "Saga:RequestTimeoutSeconds debe ser mayor que cero.")
     .Validate(

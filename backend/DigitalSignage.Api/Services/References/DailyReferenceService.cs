@@ -10,6 +10,8 @@ namespace DigitalSignage.Api.Services.References;
 public sealed class DailyReferenceService : IDailyReferenceService
 {
     private const int MaxReferenceNumberLength = 50;
+    private const int MaxRefreshAttempts = 2;
+    private static readonly TimeSpan RefreshRetryDelay = TimeSpan.FromSeconds(2);
 
     private readonly ApplicationDbContext _dbContext;
     private readonly ISagaReferenceClient _sagaClient;
@@ -139,7 +141,8 @@ public sealed class DailyReferenceService : IDailyReferenceService
             deleted);
     }
 
-    public async Task<int> RefreshAllAsync(CancellationToken cancellationToken)
+    public async Task<RefreshDailyReferencesResultDto> RefreshAllAsync(
+        CancellationToken cancellationToken)
     {
         var currentReferences = await _dbContext.DailyReferences
             .AsNoTracking()
@@ -151,21 +154,23 @@ public sealed class DailyReferenceService : IDailyReferenceService
             currentReferences.Count);
 
         int updated = 0;
+        int notFound = 0;
+        int failed = 0;
 
         foreach (var current in currentReferences)
         {
             try
             {
-                ExternalReferenceData? external =
-                    await _sagaClient.FindByReferenceAsync(
-                        current.ReferenceNumber,
-                        cancellationToken);
+                ExternalReferenceData? external = await FindWithRetryAsync(
+                    current.ReferenceNumber,
+                    cancellationToken);
 
                 if (external is null)
                 {
                     _logger.LogWarning(
                         "SagaWS no devolvió temporalmente la referencia {ReferenceNumber}.",
                         current.ReferenceNumber);
+                    notFound++;
                     continue;
                 }
 
@@ -204,6 +209,7 @@ public sealed class DailyReferenceService : IDailyReferenceService
             }
             catch (Exception exception)
             {
+                failed++;
                 _logger.LogError(
                     exception,
                     "Falló la actualización individual de {ReferenceNumber}.",
@@ -213,11 +219,68 @@ public sealed class DailyReferenceService : IDailyReferenceService
         }
 
         _logger.LogInformation(
-            "Actualización de referencias terminada. Filas actualizadas: {Count}.",
-            updated);
+            "Actualización de referencias terminada. Total: {TotalCount}, actualizadas: {RefreshedCount}, no encontradas: {NotFoundCount}, fallidas: {FailedCount}.",
+            currentReferences.Count,
+            updated,
+            notFound,
+            failed);
 
-        return updated;
+        return new RefreshDailyReferencesResultDto(
+            currentReferences.Count,
+            updated,
+            notFound,
+            failed,
+            DateTime.UtcNow);
     }
+
+    private async Task<ExternalReferenceData?> FindWithRetryAsync(
+        string referenceNumber,
+        CancellationToken cancellationToken)
+    {
+        for (int attempt = 1; ; attempt++)
+        {
+            try
+            {
+                ExternalReferenceData? result =
+                    await _sagaClient.FindByReferenceAsync(
+                    referenceNumber,
+                    cancellationToken);
+
+                if (result is not null || attempt >= MaxRefreshAttempts)
+                {
+                    return result;
+                }
+
+                _logger.LogWarning(
+                    "SagaWS no devolvió {ReferenceNumber} en el intento {Attempt} de {MaxAttempts}; se reintentará.",
+                    referenceNumber,
+                    attempt,
+                    MaxRefreshAttempts);
+
+                await Task.Delay(RefreshRetryDelay, cancellationToken);
+            }
+            catch (OperationCanceledException)
+                when (cancellationToken.IsCancellationRequested)
+            {
+                throw;
+            }
+            catch (Exception exception)
+                when (attempt < MaxRefreshAttempts && IsTransient(exception))
+            {
+                _logger.LogWarning(
+                    exception,
+                    "Falló el intento {Attempt} de {MaxAttempts} para {ReferenceNumber}; se reintentará.",
+                    attempt,
+                    MaxRefreshAttempts,
+                    referenceNumber);
+
+                await Task.Delay(RefreshRetryDelay, cancellationToken);
+            }
+        }
+    }
+
+    private static bool IsTransient(Exception exception) =>
+        exception is HttpRequestException or OperationCanceledException;
 
     private static string Normalize(string referenceNumber)
     {

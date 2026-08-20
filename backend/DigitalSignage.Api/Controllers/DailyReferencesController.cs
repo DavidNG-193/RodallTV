@@ -134,15 +134,13 @@ public sealed class DailyReferencesController : ControllerBase
     }
 
     [HttpPost("refresh")]
-    public async Task<ActionResult<object>> Refresh(
+    public async Task<ActionResult<RefreshDailyReferencesResultDto>> Refresh(
         CancellationToken cancellationToken)
     {
-        int updated = await _service.RefreshAllAsync(cancellationToken);
-        return Ok(new
-        {
-            refreshedCount = updated,
-            refreshedAtUtc = DateTime.UtcNow
-        });
+        RefreshDailyReferencesResultDto result =
+            await _service.RefreshAllAsync(cancellationToken);
+
+        return Ok(result);
     }
 
     private ObjectResult SagaUnavailable() =>
