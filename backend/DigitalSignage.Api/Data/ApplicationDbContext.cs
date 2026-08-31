@@ -21,6 +21,8 @@ public class ApplicationDbContext : DbContext
     public DbSet<DeviceExchangeRateSetting> DeviceExchangeRateSettings => Set<DeviceExchangeRateSetting>();
     public DbSet<DeviceWeatherSetting> DeviceWeatherSettings => Set<DeviceWeatherSetting>();
     public DbSet<DailyReference> DailyReferences => Set<DailyReference>();
+    public DbSet<Permission> Permissions => Set<Permission>();
+    public DbSet<UserPermission> UserPermissions => Set<UserPermission>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -72,6 +74,16 @@ public class ApplicationDbContext : DbContext
 
             entity.Property(u => u.LastLoginAt)
                 .HasColumnName("last_login_at");
+
+            entity.Property(u => u.MustChangePassword)
+                .HasColumnName("must_change_password")
+                .HasDefaultValue(false)
+                .IsRequired();
+
+            entity.Property(u => u.SessionVersion)
+                .HasColumnName("session_version")
+                .HasDefaultValue(1)
+                .IsRequired();
         });
 
         modelBuilder.Entity<Device>(entity =>
@@ -619,6 +631,137 @@ public class ApplicationDbContext : DbContext
                 .WithMany()
                 .HasForeignKey(x => x.CreatedByUserId)
                 .OnDelete(DeleteBehavior.Restrict);
+        });
+        modelBuilder.Entity<Permission>(entity =>
+        {
+            entity.ToTable("permissions");
+
+            entity.HasKey(p => p.Id);
+
+            entity.Property(p => p.Id)
+                .HasColumnName("id");
+
+            entity.Property(p => p.Code)
+                .HasColumnName("code")
+                .HasMaxLength(100)
+                .IsRequired();
+
+            entity.Property(p => p.Description)
+                .HasColumnName("description")
+                .HasMaxLength(200)
+                .IsRequired();
+
+            entity.HasIndex(p => p.Code)
+                .IsUnique();
+        });
+
+        modelBuilder.Entity<Permission>().HasData(
+            new Permission
+            {
+                Id = Guid.Parse("10000000-0000-0000-0000-000000000001"),
+                Code = "dashboard.view",
+                Description = "Ver resumen"
+            },
+            new Permission
+            {
+                Id = Guid.Parse("10000000-0000-0000-0000-000000000002"),
+                Code = "devices.view",
+                Description = "Ver dispositivos"
+            },
+            new Permission
+            {
+                Id = Guid.Parse("10000000-0000-0000-0000-000000000003"),
+                Code = "devices.manage",
+                Description = "Administrar dispositivos"
+            },
+            new Permission
+            {
+                Id = Guid.Parse("10000000-0000-0000-0000-000000000004"),
+                Code = "media.view",
+                Description = "Ver archivos multimedia"
+            },
+            new Permission
+            {
+                Id = Guid.Parse("10000000-0000-0000-0000-000000000005"),
+                Code = "media.manage",
+                Description = "Administrar archivos multimedia"
+            },
+            new Permission
+            {
+                Id = Guid.Parse("10000000-0000-0000-0000-000000000006"),
+                Code = "playlists.view",
+                Description = "Ver playlists"
+            },
+            new Permission
+            {
+                Id = Guid.Parse("10000000-0000-0000-0000-000000000007"),
+                Code = "playlists.manage",
+                Description = "Administrar playlists"
+            },
+            new Permission
+            {
+                Id = Guid.Parse("10000000-0000-0000-0000-000000000008"),
+                Code = "assignments.view",
+                Description = "Ver asignaciones"
+            },
+            new Permission
+            {
+                Id = Guid.Parse("10000000-0000-0000-0000-000000000009"),
+                Code = "assignments.manage",
+                Description = "Administrar asignaciones"
+            },
+            new Permission
+            {
+                Id = Guid.Parse("10000000-0000-0000-0000-000000000010"),
+                Code = "references.view",
+                Description = "Ver referencias"
+            },
+            new Permission
+            {
+                Id = Guid.Parse("10000000-0000-0000-0000-000000000011"),
+                Code = "references.manage",
+                Description = "Administrar referencias"
+            },
+            new Permission
+            {
+                Id = Guid.Parse("10000000-0000-0000-0000-000000000012"),
+                Code = "sync_logs.view",
+                Description = "Ver registros de sincronización"
+            },
+            new Permission
+            {
+                Id = Guid.Parse("10000000-0000-0000-0000-000000000013"),
+                Code = "users.manage",
+                Description = "Administrar usuarios"
+            });
+
+        modelBuilder.Entity<UserPermission>(entity =>
+        {
+            entity.ToTable("user_permissions");
+
+            entity.HasKey(up => new
+            {
+                up.UserId,
+                up.PermissionId
+            });
+
+            entity.Property(up => up.UserId)
+                .HasColumnName("user_id");
+
+            entity.Property(up => up.PermissionId)
+                .HasColumnName("permission_id");
+
+            entity.HasOne(up => up.User)
+                .WithMany(u => u.UserPermissions)
+                .HasForeignKey(up => up.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(up => up.Permission)
+                .WithMany(p => p.UserPermissions)
+                .HasForeignKey(up => up.PermissionId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(up => up.PermissionId);
         });
     }
 }

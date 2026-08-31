@@ -19,4 +19,10 @@ public class User
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     public DateTime? LastLoginAt { get; set; }
+
+    public bool MustChangePassword { get; set; } = false;
+
+    public int SessionVersion { get; set; } = 1;
+
+    public ICollection<UserPermission> UserPermissions { get; set; } = new List<UserPermission>();
 }

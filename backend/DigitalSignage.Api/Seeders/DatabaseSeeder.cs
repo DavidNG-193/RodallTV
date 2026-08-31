@@ -11,11 +11,12 @@ public static class DatabaseSeeder
         ApplicationDbContext context,
         WeatherOptions weatherOptions)
     {
-        bool adminExists = await context.Users.AnyAsync(u => u.Email == "gherson@rodall.com");
+        User? adminUser = await context.Users
+            .FirstOrDefaultAsync(u => u.Email == "gherson@rodall.com");
 
-        if (!adminExists)
+        if (adminUser is null)
         {
-            var adminUser = new User
+            adminUser = new User
             {
                 Id = Guid.NewGuid(),
                 FirstName = "Admin",
@@ -28,6 +29,30 @@ public static class DatabaseSeeder
             };
 
             context.Users.Add(adminUser);
+            await context.SaveChangesAsync();
+        }
+
+        var allPermissionIds = await context.Permissions
+            .Select(permission => permission.Id)
+            .ToListAsync();
+
+        var assignedPermissionIds = await context.UserPermissions
+            .Where(userPermission => userPermission.UserId == adminUser.Id)
+            .Select(userPermission => userPermission.PermissionId)
+            .ToListAsync();
+
+        var missingUserPermissions = allPermissionIds
+            .Except(assignedPermissionIds)
+            .Select(permissionId => new UserPermission
+            {
+                UserId = adminUser.Id,
+                PermissionId = permissionId
+            })
+            .ToList();
+
+        if (missingUserPermissions.Count > 0)
+        {
+            context.UserPermissions.AddRange(missingUserPermissions);
             await context.SaveChangesAsync();
         }
 
