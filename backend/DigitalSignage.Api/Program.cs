@@ -43,6 +43,7 @@ builder.Services.AddScoped<IAgentExchangeRateService, AgentExchangeRateService>(
 builder.Services.AddScoped<IDeviceWeatherSettingsService, DeviceWeatherSettingsService>();
 builder.Services.AddScoped<IAgentReferenceService, AgentReferenceService>();
 builder.Services.AddScoped<UserSessionValidationService>();
+builder.Services.AddScoped<UsersService>();
 
 // Authentication - JWT
 builder.Services.AddAuthentication(options =>
