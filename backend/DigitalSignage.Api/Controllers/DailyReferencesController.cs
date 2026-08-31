@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using DigitalSignage.Api.Authorization;
 using DigitalSignage.Api.DTOs.References;
 using DigitalSignage.Api.Services.References;
 using Microsoft.AspNetCore.Authorization;
@@ -19,6 +20,7 @@ public sealed class DailyReferencesController : ControllerBase
     }
 
     [HttpGet]
+    [HasPermission(PermissionCodes.ReferencesView)]
     public async Task<ActionResult<IReadOnlyList<DailyReferenceDto>>> GetAll(
         CancellationToken cancellationToken)
     {
@@ -26,6 +28,7 @@ public sealed class DailyReferencesController : ControllerBase
     }
 
     [HttpGet("lookup")]
+    [HasPermission(PermissionCodes.ReferencesManage)]
     public async Task<ActionResult<ReferenceLookupResponseDto>> Lookup(
         [FromQuery] string referenceNumber,
         CancellationToken cancellationToken)
@@ -61,6 +64,7 @@ public sealed class DailyReferencesController : ControllerBase
     }
 
     [HttpPost]
+    [HasPermission(PermissionCodes.ReferencesManage)]
     public async Task<ActionResult<DailyReferenceDto>> Create(
         [FromBody] CreateDailyReferenceRequest request,
         CancellationToken cancellationToken)
@@ -110,6 +114,7 @@ public sealed class DailyReferencesController : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
+    [HasPermission(PermissionCodes.ReferencesManage)]
     public async Task<IActionResult> Delete(
         Guid id,
         CancellationToken cancellationToken)
@@ -126,6 +131,7 @@ public sealed class DailyReferencesController : ControllerBase
     }
 
     [HttpDelete]
+    [HasPermission(PermissionCodes.ReferencesManage)]
     public async Task<IActionResult> DeleteAll(
         CancellationToken cancellationToken)
     {
@@ -134,6 +140,7 @@ public sealed class DailyReferencesController : ControllerBase
     }
 
     [HttpPost("refresh")]
+    [HasPermission(PermissionCodes.ReferencesManage)]
     public async Task<ActionResult<RefreshDailyReferencesResultDto>> Refresh(
         CancellationToken cancellationToken)
     {
