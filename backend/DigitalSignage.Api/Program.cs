@@ -40,6 +40,7 @@ builder.Services.AddScoped<IDeviceExchangeRateSettingsService, DeviceExchangeRat
 builder.Services.AddScoped<IAgentExchangeRateService, AgentExchangeRateService>();
 builder.Services.AddScoped<IDeviceWeatherSettingsService, DeviceWeatherSettingsService>();
 builder.Services.AddScoped<IAgentReferenceService, AgentReferenceService>();
+builder.Services.AddScoped<UserSessionValidationService>();
 
 // Authentication - JWT
 builder.Services.AddAuthentication(options =>
@@ -63,6 +64,28 @@ builder.Services.AddAuthentication(options =>
         ValidIssuer = jwtIssuer,
         ValidAudience = jwtAudience,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
+    };
+    options.Events = new JwtBearerEvents
+    {
+        OnTokenValidated = async context =>
+        {
+            var sessionValidator =
+                context.HttpContext.RequestServices
+                    .GetRequiredService<
+                        UserSessionValidationService>();
+
+            var isValid =
+                await sessionValidator
+                    .IsSessionValidAsync(
+                        context.Principal!);
+
+            if (!isValid)
+            {
+                context.Fail(
+                    "La sesión ya no es válida."
+                );
+            }
+        }
     };
 });
 

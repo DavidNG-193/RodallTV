@@ -1,7 +1,8 @@
+using System.Security.Claims;
 using DigitalSignage.Api.DTOs.Auth;
 using DigitalSignage.Api.Services;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace DigitalSignage.Api.Controllers;
 
@@ -34,16 +35,22 @@ public class AuthController : ControllerBase
 
     [Authorize]
     [HttpGet("me")]
-    public IActionResult Me()
+    public async Task<ActionResult<CurrentUserDto>> Me()
     {
-        var email = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
-        var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
+        var userIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-        return Ok(new
+        if (!Guid.TryParse(userIdValue, out var userId))
         {
-            email,
-            role,
-            message = "Token válido"
-        });
+            return Unauthorized();
+        }
+
+        var user = await _authService.GetCurrentUserAsync(userId);
+
+        if (user is null)
+        {
+            return Unauthorized();
+        }
+
+        return Ok(user);
     }
 }
