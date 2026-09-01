@@ -136,6 +136,67 @@
   grid-column: span 2;
 }
 
+.users-password-input {
+  position: relative;
+}
+
+.users-password-input input {
+  padding-right: 6rem;
+}
+
+.users-password-input__toggle {
+  position: absolute;
+  top: 50%;
+  right: 0.45rem;
+  display: inline-flex;
+  min-height: 34px;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.55rem;
+  border: 0;
+  border-radius: 0.45rem;
+  color: #344054;
+  background: #ffffff;
+  font-size: 0.8rem;
+  font-weight: 800;
+  transform: translateY(-50%);
+}
+
+.users-password-input__toggle:hover {
+  color: var(--color-gold-dark);
+  background: #fff8e4;
+}
+
+.users-password-input__toggle--icon {
+  width: 36px;
+  padding: 0;
+}
+
+.users-password-input:has(.users-password-input__toggle--icon) input {
+  padding-right: 3.25rem;
+}
+
+.users-password-disclosure {
+  margin-bottom: 1.25rem;
+  padding: 1rem;
+  border: 1px solid #f1d58d;
+  border-radius: var(--radius-medium);
+  background: #fffae9;
+}
+
+.users-password-disclosure p {
+  margin-bottom: 1rem;
+  color: #714b0c;
+  font-weight: 650;
+}
+
+.users-password-disclosure label {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
 .users-self-notice,
 .users-permissions__notice {
   display: flex;

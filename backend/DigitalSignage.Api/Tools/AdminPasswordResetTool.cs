@@ -9,11 +9,11 @@ public static class AdminPasswordResetTool
     public static async Task<bool> ResetAsync(
         ApplicationDbContext context,
         string email,
-        string temporaryPassword)
+        string password)
     {
         if (string.IsNullOrWhiteSpace(email)
-            || string.IsNullOrWhiteSpace(temporaryPassword)
-            || temporaryPassword.Length is < 8 or > 100)
+            || string.IsNullOrWhiteSpace(password)
+            || password.Length is < 8 or > 100)
         {
             return false;
         }
@@ -31,9 +31,9 @@ public static class AdminPasswordResetTool
 
         user.PasswordHash =
             BCrypt.Net.BCrypt.HashPassword(
-                temporaryPassword);
+                password);
 
-        user.MustChangePassword = true;
+        user.MustChangePassword = false;
         user.SessionVersion++;
         user.IsActive = true;
 

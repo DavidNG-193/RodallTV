@@ -1,5 +1,5 @@
 import axios from "axios";
-import { KeyRound, LogOut } from "lucide-react";
+import { Eye, EyeOff, KeyRound, LogOut } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { brandAssets } from "../config/brandAssets";
@@ -13,6 +13,9 @@ export function ChangePasswordPage() {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmation, setConfirmation] = useState("");
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -68,15 +71,30 @@ export function ChangePasswordPage() {
         <form className="login-form" onSubmit={handleSubmit}>
           <div className="login-field">
             <label htmlFor="current-password"><KeyRound size={20} aria-hidden="true" />Contraseña actual</label>
-            <input id="current-password" type="password" value={currentPassword} onChange={(event) => setCurrentPassword(event.target.value)} autoComplete="current-password" required />
+            <div className="login-password">
+              <input id="current-password" type={showCurrentPassword ? "text" : "password"} value={currentPassword} onChange={(event) => setCurrentPassword(event.target.value)} autoComplete="current-password" required />
+              <button type="button" className="login-password__toggle" aria-label={showCurrentPassword ? "Ocultar contraseña actual" : "Ver contraseña actual"} onClick={() => setShowCurrentPassword((current) => !current)}>
+                {showCurrentPassword ? <EyeOff size={21} aria-hidden="true" /> : <Eye size={21} aria-hidden="true" />}
+              </button>
+            </div>
           </div>
           <div className="login-field">
             <label htmlFor="new-password"><KeyRound size={20} aria-hidden="true" />Nueva contraseña</label>
-            <input id="new-password" type="password" value={newPassword} onChange={(event) => setNewPassword(event.target.value)} autoComplete="new-password" minLength={8} required />
+            <div className="login-password">
+              <input id="new-password" type={showNewPassword ? "text" : "password"} value={newPassword} onChange={(event) => setNewPassword(event.target.value)} autoComplete="new-password" minLength={8} required />
+              <button type="button" className="login-password__toggle" aria-label={showNewPassword ? "Ocultar nueva contraseña" : "Ver nueva contraseña"} onClick={() => setShowNewPassword((current) => !current)}>
+                {showNewPassword ? <EyeOff size={21} aria-hidden="true" /> : <Eye size={21} aria-hidden="true" />}
+              </button>
+            </div>
           </div>
           <div className="login-field">
             <label htmlFor="password-confirmation"><KeyRound size={20} aria-hidden="true" />Confirmar nueva contraseña</label>
-            <input id="password-confirmation" type="password" value={confirmation} onChange={(event) => setConfirmation(event.target.value)} autoComplete="new-password" minLength={8} required />
+            <div className="login-password">
+              <input id="password-confirmation" type={showConfirmation ? "text" : "password"} value={confirmation} onChange={(event) => setConfirmation(event.target.value)} autoComplete="new-password" minLength={8} required />
+              <button type="button" className="login-password__toggle" aria-label={showConfirmation ? "Ocultar confirmación" : "Ver confirmación"} onClick={() => setShowConfirmation((current) => !current)}>
+                {showConfirmation ? <EyeOff size={21} aria-hidden="true" /> : <Eye size={21} aria-hidden="true" />}
+              </button>
+            </div>
           </div>
           {errorMessage && <div className="login-alert" role="alert">{errorMessage}</div>}
           <button className="login-submit" type="submit" disabled={isSubmitting}>

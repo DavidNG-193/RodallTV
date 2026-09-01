@@ -269,7 +269,7 @@ if (args.Contains("--reset-admin-password"))
     if (password.Length is < 8 or > 100)
     {
         Console.Error.WriteLine(
-            "La contraseña temporal debe tener entre 8 y 100 caracteres.");
+            "La contraseña debe tener entre 8 y 100 caracteres.");
         return;
     }
 

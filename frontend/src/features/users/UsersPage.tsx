@@ -8,10 +8,11 @@ import {
   RotateCcw,
   Users,
 } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { EmptyState } from "../../components/common/EmptyState";
 import { LoadingState } from "../../components/common/LoadingState";
 import { ResetPasswordModal } from "./ResetPasswordModal";
+import { PasswordDisclosureModal } from "./PasswordDisclosureModal";
 import { UserFormModal } from "./UserFormModal";
 import { USER_ROLES } from "./users.constants";
 import { usersService } from "./users.service";
@@ -22,6 +23,13 @@ type FormModalState =
   | { mode: "create" }
   | { mode: "edit"; user: UserDetail }
   | null;
+
+interface DisclosedCredential {
+  userName: string;
+  password: string;
+}
+
+type UserListFilter = "active" | "inactive" | "all";
 
 function formatDateTime(value: string | null): string {
   if (!value) return "Nunca";
@@ -43,11 +51,20 @@ export function UsersPage() {
   const [users, setUsers] = useState<UserListItem[]>([]);
   const [formModal, setFormModal] = useState<FormModalState>(null);
   const [resetUser, setResetUser] = useState<UserListItem | null>(null);
+  const [disclosedCredential, setDisclosedCredential] =
+    useState<DisclosedCredential | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [changingStatusId, setChangingStatusId] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [filter, setFilter] = useState<UserListFilter>("active");
+
+  const visibleUsers = useMemo(() => {
+    if (filter === "all") return users;
+    const shouldBeActive = filter === "active";
+    return users.filter((user) => user.isActive === shouldBeActive);
+  }, [filter, users]);
 
   const loadUsers = useCallback(async (showLoading = true) => {
     if (showLoading) setIsLoading(true);
@@ -125,15 +142,27 @@ export function UsersPage() {
     }
   };
 
-  const handleSaved = (message: string) => {
+  const handleSaved = (
+    message: string,
+    disclosedPassword?: string,
+    userName?: string,
+  ) => {
     setFormModal(null);
     setSuccessMessage(message);
+    if (disclosedPassword && userName) {
+      setDisclosedCredential({ password: disclosedPassword, userName });
+    }
     void loadUsers(false);
   };
 
-  const handlePasswordReset = (message: string) => {
+  const handlePasswordReset = (
+    message: string,
+    disclosedPassword: string,
+    userName: string,
+  ) => {
     setResetUser(null);
     setSuccessMessage(message);
+    setDisclosedCredential({ password: disclosedPassword, userName });
     void loadUsers(false);
   };
 
@@ -147,6 +176,18 @@ export function UsersPage() {
         </div>
 
         <div className="page-heading__actions">
+          <div className="device-filter">
+            <label htmlFor="user-filter">Mostrar</label>
+            <select
+              id="user-filter"
+              value={filter}
+              onChange={(event) => setFilter(event.target.value as UserListFilter)}
+            >
+              <option value="active">Activos</option>
+              <option value="inactive">Inactivos</option>
+              <option value="all">Todos</option>
+            </select>
+          </div>
           <button type="button" className="button button--secondary" disabled={isLoading} onClick={() => void loadUsers()}>
             <RefreshCw size={18} aria-hidden="true" />
             Actualizar
@@ -181,15 +222,22 @@ export function UsersPage() {
         <div className="panel__heading users-list-card__heading">
           <div>
             <h3>Cuentas del sistema</h3>
-            <p>{users.length} usuario{users.length === 1 ? "" : "s"} registrado{users.length === 1 ? "" : "s"}</p>
+            <p>
+              {visibleUsers.length} usuario{visibleUsers.length === 1 ? "" : "s"}
+              {filter === "active" ? " activo" : filter === "inactive" ? " inactivo" : " registrado"}
+              {visibleUsers.length === 1 ? "" : "s"}
+            </p>
           </div>
           <span className="users-list-card__icon"><Users size={22} aria-hidden="true" /></span>
         </div>
 
         {isLoading ? (
           <LoadingState message="Cargando usuarios..." />
-        ) : users.length === 0 ? (
-          <EmptyState title="No hay usuarios para mostrar" description="Crea una cuenta para comenzar a administrar accesos." />
+        ) : visibleUsers.length === 0 ? (
+          <EmptyState
+            title={filter === "active" ? "No hay usuarios activos" : filter === "inactive" ? "No hay usuarios inactivos" : "No hay usuarios para mostrar"}
+            description={filter === "all" ? "Crea una cuenta para comenzar a administrar accesos." : "Selecciona otro filtro para consultar las demás cuentas."}
+          />
         ) : (
           <div className="table-wrapper">
             <table className="data-table users-table">
@@ -205,14 +253,14 @@ export function UsersPage() {
                 </tr>
               </thead>
               <tbody>
-                {users.map((user) => (
+                {visibleUsers.map((user) => (
                   <tr key={user.id}>
                     <td><strong>{user.firstName} {user.lastName}</strong><small>Creado {formatDateTime(user.createdAt)}</small></td>
                     <td>{user.email}</td>
                     <td><span className={`users-role users-role--${user.role.toLowerCase()}`}>{user.role === USER_ROLES.ADMINISTRATOR ? "Administrador" : "Usuario"}</span></td>
                     <td><span className={`record-status record-status--${user.isActive ? "active" : "inactive"}`}>{user.isActive ? "Activo" : "Inactivo"}</span></td>
                     <td>{formatDateTime(user.lastLoginAt)}</td>
-                    <td><span className={`users-password-status users-password-status--${user.mustChangePassword ? "pending" : "updated"}`}>{user.mustChangePassword ? "Pendiente" : "Actualizada"}</span></td>
+                    <td><span className="users-password-status users-password-status--updated">Configurada</span></td>
                     <td>
                       <div className="table-actions users-table__actions">
                         <button type="button" className="icon-button" aria-label={`Editar a ${user.firstName} ${user.lastName}`} title="Editar usuario" disabled={editingId === user.id} onClick={() => void openEditModal(user)}>
@@ -221,7 +269,7 @@ export function UsersPage() {
                         <button type="button" className={`icon-button${user.isActive ? " icon-button--danger" : ""}`} aria-label={`${user.isActive ? "Desactivar" : "Activar"} a ${user.firstName} ${user.lastName}`} title={user.isActive ? "Desactivar usuario" : "Activar usuario"} disabled={changingStatusId === user.id} onClick={() => void handleStatusChange(user)}>
                           {user.isActive ? <Power size={17} aria-hidden="true" /> : <RotateCcw size={17} aria-hidden="true" />}
                         </button>
-                        <button type="button" className="icon-button" aria-label={`Restablecer contraseña de ${user.firstName} ${user.lastName}`} title="Restablecer contraseña" onClick={() => {
+                        <button type="button" className="icon-button" aria-label={`Definir nueva contraseña para ${user.firstName} ${user.lastName}`} title="Definir nueva contraseña" onClick={() => {
                           setErrorMessage("");
                           setSuccessMessage("");
                           setResetUser(user);
@@ -246,6 +294,13 @@ export function UsersPage() {
       )}
       {resetUser && (
         <ResetPasswordModal key={resetUser.id} user={resetUser} onClose={() => setResetUser(null)} onReset={handlePasswordReset} />
+      )}
+      {disclosedCredential && (
+        <PasswordDisclosureModal
+          userName={disclosedCredential.userName}
+          password={disclosedCredential.password}
+          onClose={() => setDisclosedCredential(null)}
+        />
       )}
     </section>
   );

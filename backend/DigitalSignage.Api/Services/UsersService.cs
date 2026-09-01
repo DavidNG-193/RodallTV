@@ -180,10 +180,10 @@ public class UsersService
             LastName = request.LastName.Trim(),
             Email = email,
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(
-                request.TemporaryPassword),
+                request.Password),
             Role = role,
             IsActive = true,
-            MustChangePassword = true,
+            MustChangePassword = false,
             SessionVersion = 1,
             CreatedAt = DateTime.UtcNow,
             LastLoginAt = null
@@ -346,7 +346,7 @@ public class UsersService
 
     public async Task<bool> ResetPasswordAsync(
     Guid id,
-    string temporaryPassword)
+    string password)
     {
         var user = await _context.Users
             .FirstOrDefaultAsync(u => u.Id == id);
@@ -355,9 +355,9 @@ public class UsersService
             return false;
 
         user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(
-            temporaryPassword);
+            password);
 
-        user.MustChangePassword = true;
+        user.MustChangePassword = false;
         user.SessionVersion++;
 
         await _context.SaveChangesAsync();

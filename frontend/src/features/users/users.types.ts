@@ -18,7 +18,7 @@ export interface CreateUserPayload {
   firstName: string;
   lastName: string;
   email: string;
-  temporaryPassword: string;
+  password: string;
   role: string;
   permissions: string[];
 }

@@ -100,7 +100,7 @@ public class UsersController : ControllerBase
     {
         var updated = await _usersService.ResetPasswordAsync(
             id,
-            request.TemporaryPassword);
+            request.Password);
 
         if (!updated)
             return NotFound();

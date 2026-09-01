@@ -14,7 +14,7 @@ public class CreateUserRequestDto
     public string Email { get; set; } = string.Empty;
 
     [Required, MinLength(8), MaxLength(100)]
-    public string TemporaryPassword { get; set; } = string.Empty;
+    public string Password { get; set; } = string.Empty;
 
     [Required]
     public string Role { get; set; } = string.Empty;

@@ -1,5 +1,5 @@
 import axios from "axios";
-import { ShieldCheck, UserPlus, X } from "lucide-react";
+import { Eye, EyeOff, ShieldCheck, UserPlus, X } from "lucide-react";
 import { useEffect, useState, type FormEvent } from "react";
 import { PERMISSIONS } from "../auth/permission.constants";
 import { useAuth } from "../auth/useAuth";
@@ -12,7 +12,7 @@ interface UserFormModalProps {
   mode: "create" | "edit";
   user?: UserDetail;
   onClose: () => void;
-  onSaved: (message: string) => void;
+  onSaved: (message: string, disclosedPassword?: string, userName?: string) => void;
 }
 
 const allPermissions = Object.values(PERMISSIONS);
@@ -43,7 +43,8 @@ export function UserFormModal({
       ? allPermissions
       : (user?.permissions ?? []),
   );
-  const [temporaryPassword, setTemporaryPassword] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -87,8 +88,8 @@ export function UserFormModal({
       setErrorMessage("Selecciona un rol válido.");
       return;
     }
-    if (mode === "create" && temporaryPassword.length < 8) {
-      setErrorMessage("La contraseña temporal debe tener al menos 8 caracteres.");
+    if (mode === "create" && password.length < 8) {
+      setErrorMessage("La contraseña debe tener al menos 8 caracteres.");
       return;
     }
 
@@ -101,12 +102,17 @@ export function UserFormModal({
           firstName: normalizedFirstName,
           lastName: normalizedLastName,
           email: normalizedEmail,
-          temporaryPassword,
+          password,
           role,
           permissions: selectedPermissions,
         });
-        setTemporaryPassword("");
-        onSaved("Usuario creado correctamente.");
+        const disclosedPassword = password;
+        setPassword("");
+        onSaved(
+          "Usuario creado correctamente.",
+          disclosedPassword,
+          `${normalizedFirstName} ${normalizedLastName}`,
+        );
       } else if (user) {
         await usersService.updateUser(user.id, {
           firstName: normalizedFirstName,
@@ -166,8 +172,13 @@ export function UserFormModal({
             </div>
             {mode === "create" && (
               <div className="form-field">
-                <label htmlFor="user-temporary-password">Contraseña temporal</label>
-                <input id="user-temporary-password" type="password" value={temporaryPassword} onChange={(event) => setTemporaryPassword(event.target.value)} minLength={8} maxLength={100} autoComplete="new-password" required />
+                <label htmlFor="user-password">Contraseña</label>
+                <div className="users-password-input">
+                  <input id="user-password" type={showPassword ? "text" : "password"} value={password} onChange={(event) => setPassword(event.target.value)} minLength={8} maxLength={100} autoComplete="new-password" required />
+                  <button type="button" className="users-password-input__toggle users-password-input__toggle--icon" aria-label={showPassword ? "Ocultar contraseña" : "Ver contraseña"} onClick={() => setShowPassword((current) => !current)}>
+                    {showPassword ? <EyeOff size={19} aria-hidden="true" /> : <Eye size={19} aria-hidden="true" />}
+                  </button>
+                </div>
               </div>
             )}
           </div>

@@ -5,7 +5,7 @@ interface StatusBadgeProps {
 }
 
 const labels: Record<DeviceStatus, string> = {
-  Online: "En línea",
+  Online: "Sincronizado",
   Offline: "Desconectado",
   Syncing: "Sincronizando",
   Error: "Error",

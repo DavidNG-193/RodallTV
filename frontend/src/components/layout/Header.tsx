@@ -5,6 +5,9 @@ import { useAuth } from "../../features/auth/useAuth";
 export function Header() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const displayName = [user?.firstName, user?.lastName]
+    .filter(Boolean)
+    .join(" ");
 
   const handleLogout = () => {
     logout();
@@ -20,7 +23,7 @@ export function Header() {
 
       <div className="header__account">
         <div>
-          <strong>{user?.email ?? "Administrador"}</strong>
+          <strong>{displayName || user?.email || "Administrador"}</strong>
           <small>{user?.role ?? "Administrator"}</small>
         </div>
 

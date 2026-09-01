@@ -31,9 +31,9 @@ export const usersService = {
     await httpClient.patch(`/api/users/${id}/status`, { isActive });
   },
 
-  async resetUserPassword(id: string, temporaryPassword: string): Promise<void> {
+  async resetUserPassword(id: string, password: string): Promise<void> {
     await httpClient.post(`/api/users/${id}/reset-password`, {
-      temporaryPassword,
+      password,
     });
   },
 };
