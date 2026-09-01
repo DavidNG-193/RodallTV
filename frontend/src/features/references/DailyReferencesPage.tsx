@@ -10,6 +10,8 @@ import { getReferenceErrorMessage } from "./referenceErrors";
 import { referencesApi } from "./referencesApi";
 import type { DailyReference } from "./types";
 import "./DailyReferencesPage.css";
+import { PERMISSIONS } from "../auth/permission.constants";
+import { useAuth } from "../auth/useAuth";
 
 const pollingIntervalMilliseconds = 30_000;
 
@@ -18,6 +20,8 @@ type ConfirmationTarget =
   | { kind: "all" };
 
 export function DailyReferencesPage() {
+  const { hasPermission } = useAuth();
+  const canManageReferences = hasPermission(PERMISSIONS.REFERENCES_MANAGE);
   const [references, setReferences] = useState<DailyReference[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -167,7 +171,7 @@ export function DailyReferencesPage() {
         </div>
       </div>
 
-      <ReferenceLookupForm onCreated={handleCreated} />
+      {canManageReferences && <ReferenceLookupForm onCreated={handleCreated} />}
 
       {(loadError || actionError) && (
         <div className="alert alert--error references-page__alert" role="alert">
@@ -199,7 +203,7 @@ export function DailyReferencesPage() {
             <ReferencesSummary references={references} />
           </div>
 
-          <div className="references-list-card__actions">
+          {canManageReferences && <div className="references-list-card__actions">
             <button
               type="button"
               className="button button--secondary"
@@ -223,7 +227,7 @@ export function DailyReferencesPage() {
               <Trash2 size={18} aria-hidden="true" />
               Eliminar todas
             </button>
-          </div>
+          </div>}
         </div>
 
         {isLoading ? (
@@ -237,12 +241,13 @@ export function DailyReferencesPage() {
           <DailyReferencesTable
             references={references}
             deletingId={deletingId}
+            canDelete={canManageReferences}
             onDelete={(reference) => setConfirmation({ kind: "single", reference })}
           />
         )}
       </section>
 
-      {confirmation && (
+      {canManageReferences && confirmation && (
         <ConfirmationDialog
           {...confirmationContent}
           isBusy={Boolean(deletingId) || isDeletingAll}

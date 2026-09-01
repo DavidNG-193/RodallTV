@@ -26,6 +26,8 @@ import type {
   PlaylistItem,
   UpdatePlaylistItemRequest,
 } from "../features/playlist/playlists.types";
+import { PERMISSIONS } from "../features/auth/permission.constants";
+import { useAuth } from "../features/auth/useAuth";
 
 interface PlaylistDetailData {
   playlist: Playlist;
@@ -59,11 +61,12 @@ function getErrorMessage(error: unknown): string {
 
 async function fetchPlaylistDetail(
   playlistId: string,
+  includeManagementData: boolean,
 ): Promise<PlaylistDetailData> {
   const [playlist, items, media] = await Promise.all([
     playlistsService.getById(playlistId),
     playlistsService.getItems(playlistId),
-    mediaService.getAll(),
+    includeManagementData ? mediaService.getAll() : Promise.resolve([]),
   ]);
 
   return {
@@ -76,6 +79,8 @@ async function fetchPlaylistDetail(
 }
 
 export function PlaylistDetailPage() {
+  const { hasPermission } = useAuth();
+  const canManagePlaylists = hasPermission(PERMISSIONS.PLAYLISTS_MANAGE);
   const { playlistId } = useParams<{ playlistId: string }>();
   const navigate = useNavigate();
   const [playlist, setPlaylist] = useState<Playlist | null>(null);
@@ -103,13 +108,13 @@ export function PlaylistDetailPage() {
     setErrorMessage("");
 
     try {
-      applyData(await fetchPlaylistDetail(playlistId));
+      applyData(await fetchPlaylistDetail(playlistId, canManagePlaylists));
     } catch (error) {
       setErrorMessage(getErrorMessage(error));
     } finally {
       setIsLoading(false);
     }
-  }, [applyData, playlistId]);
+  }, [applyData, canManagePlaylists, playlistId]);
 
   useEffect(() => {
     if (!playlistId) {
@@ -118,7 +123,7 @@ export function PlaylistDetailPage() {
 
     let isCancelled = false;
 
-    void fetchPlaylistDetail(playlistId)
+    void fetchPlaylistDetail(playlistId, canManagePlaylists)
       .then((data) => {
         if (!isCancelled) {
           applyData(data);
@@ -138,7 +143,7 @@ export function PlaylistDetailPage() {
     return () => {
       isCancelled = true;
     };
-  }, [applyData, playlistId]);
+  }, [applyData, canManagePlaylists, playlistId]);
 
   const openAddForm = () => {
     setSelectedItem(null);
@@ -306,7 +311,7 @@ export function PlaylistDetailPage() {
             Actualizar
           </button>
 
-          <button
+          {canManagePlaylists && <button
             type="button"
             className="button button--primary"
             onClick={openAddForm}
@@ -314,7 +319,7 @@ export function PlaylistDetailPage() {
           >
             <Plus size={18} aria-hidden="true" />
             Agregar contenido
-          </button>
+          </button>}
         </div>
       </div>
 
@@ -324,7 +329,7 @@ export function PlaylistDetailPage() {
         </div>
       )}
 
-      {isFormVisible && (
+      {canManagePlaylists && isFormVisible && (
         <section className="panel">
           <div className="panel__heading">
             <h3>
@@ -374,7 +379,7 @@ export function PlaylistDetailPage() {
                   </small>
                 </div>
 
-                <div className="playlist-item-row__actions">
+                {canManagePlaylists && <div className="playlist-item-row__actions">
                   <button
                     type="button"
                     className="icon-button"
@@ -416,7 +421,7 @@ export function PlaylistDetailPage() {
                   >
                     <Trash2 size={17} aria-hidden="true" />
                   </button>
-                </div>
+                </div>}
               </article>
             ))}
           </div>

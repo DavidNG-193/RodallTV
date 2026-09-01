@@ -10,12 +10,14 @@ import { ReferenceStatusBadge } from "./ReferenceStatusBadge";
 interface DailyReferencesTableProps {
   references: DailyReference[];
   deletingId: string | null;
+  canDelete: boolean;
   onDelete: (reference: DailyReference) => void;
 }
 
 export function DailyReferencesTable({
   references,
   deletingId,
+  canDelete,
   onDelete,
 }: DailyReferencesTableProps) {
   return (
@@ -29,7 +31,7 @@ export function DailyReferencesTable({
             <th>Aduana / Régimen</th>
             <th>Estatus</th>
             <th>Actualizado</th>
-            <th>Acción</th>
+            {canDelete && <th>Acción</th>}
           </tr>
         </thead>
         <tbody>
@@ -68,7 +70,7 @@ export function DailyReferencesTable({
                 />
               </td>
               <td>{formatReferenceDateTime(reference.lastExternalUpdateAt)}</td>
-              <td>
+              {canDelete && <td>
                 <button
                   type="button"
                   className="icon-button icon-button--danger"
@@ -79,7 +81,7 @@ export function DailyReferencesTable({
                 >
                   <Trash2 size={17} aria-hidden="true" />
                 </button>
-              </td>
+              </td>}
             </tr>
           ))}
         </tbody>

@@ -38,6 +38,8 @@ import {
   formatDuration,
   formatFileSize,
 } from "../utils/fileFormatters";
+import { PERMISSIONS } from "../features/auth/permission.constants";
+import { useAuth } from "../features/auth/useAuth";
 
 type MediaFilter = "all" | "image" | "video";
 type FormMode = "upload" | "folder" | null;
@@ -127,6 +129,8 @@ function MediaImagePreview({ item }: { item: MediaItem }) {
 }
 
 export function MediaPage() {
+  const { hasPermission } = useAuth();
+  const canManageMedia = hasPermission(PERMISSIONS.MEDIA_MANAGE);
   const [media, setMedia] = useState<MediaItem[]>([]);
   const [folders, setFolders] = useState<MediaFolder[]>([]);
   const [selectedFolderId, setSelectedFolderId] =
@@ -409,7 +413,7 @@ export function MediaPage() {
             Actualizar
           </button>
 
-          {showsFolders && (
+          {canManageMedia && showsFolders && (
             <button
               type="button"
               className="button button--secondary"
@@ -420,7 +424,7 @@ export function MediaPage() {
             </button>
           )}
 
-          <button
+          {canManageMedia && <button
             type="button"
             className="button button--primary"
             onClick={() => {
@@ -431,7 +435,7 @@ export function MediaPage() {
           >
             <Upload size={18} aria-hidden="true" />
             Subir archivo
-          </button>
+          </button>}
         </div>
       </div>
 
@@ -441,7 +445,7 @@ export function MediaPage() {
         </div>
       )}
 
-      {formMode === "upload" && (
+      {canManageMedia && formMode === "upload" && (
         <section className="panel">
           <div className="panel__heading">
             <h3>Subir contenido multimedia</h3>
@@ -461,7 +465,7 @@ export function MediaPage() {
         </section>
       )}
 
-      {formMode === "folder" && (
+      {canManageMedia && formMode === "folder" && (
         <section className="panel">
           <div className="panel__heading">
             <h3>
@@ -556,7 +560,7 @@ export function MediaPage() {
                       </span>
                     </button>
 
-                    <div className="file-manager-folder__actions">
+                    {canManageMedia && <div className="file-manager-folder__actions">
                       <button
                         type="button"
                         className="icon-button"
@@ -578,7 +582,7 @@ export function MediaPage() {
                       >
                         <Trash2 size={17} aria-hidden="true" />
                       </button>
-                    </div>
+                    </div>}
                   </article>
                 );
               })}
@@ -651,7 +655,7 @@ export function MediaPage() {
                         <Download size={17} aria-hidden="true" />
                       </button>
 
-                      <button
+                      {canManageMedia && <button
                         type="button"
                         className="icon-button icon-button--danger"
                         title="Desactivar archivo"
@@ -659,7 +663,7 @@ export function MediaPage() {
                         onClick={() => void handleDeactivate(item)}
                       >
                         <Trash2 size={17} aria-hidden="true" />
-                      </button>
+                      </button>}
                     </div>
                   </div>
                 </article>

@@ -207,6 +207,32 @@ font-size: 38px;
   font-weight: 600;
 }
 
+.login-alert--success {
+  border-color: rgb(134 239 172 / 45%);
+  color: #dcfce7;
+  background: rgb(22 101 52 / 42%);
+}
+
+.change-password-card {
+  width: min(100%, 570px);
+}
+
+.change-password-card__cancel {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.45rem;
+  border: 0;
+  color: #eeeeee;
+  background: transparent;
+  font-weight: 700;
+}
+
+.change-password-card__cancel:hover {
+  color: var(--color-gold-light);
+}
+
 .login-submit {
   display: inline-flex;
   align-items: center;

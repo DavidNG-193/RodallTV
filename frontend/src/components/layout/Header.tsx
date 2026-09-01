@@ -1,8 +1,15 @@
-import { LogOut } from "lucide-react";
+import { KeyRound, LogOut } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../features/auth/useAuth";
 
 export function Header() {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login", { replace: true });
+  };
 
   return (
     <header className="header">
@@ -17,10 +24,17 @@ export function Header() {
           <small>{user?.role ?? "Administrator"}</small>
         </div>
 
-        <button type="button" className="button button--ghost" onClick={logout}>
-          <LogOut size={18} aria-hidden="true" />
-          Cerrar sesión
-        </button>
+        <div className="header__actions">
+          <Link className="button button--ghost" to="/change-password">
+            <KeyRound size={18} aria-hidden="true" />
+            Cambiar contraseña
+          </Link>
+
+          <button type="button" className="button button--ghost" onClick={handleLogout}>
+            <LogOut size={18} aria-hidden="true" />
+            Cerrar sesión
+          </button>
+        </div>
       </div>
     </header>
   );

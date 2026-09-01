@@ -19,6 +19,8 @@ import type {
   DeviceListFilter,
   UpdateDeviceRequest,
 } from "../features/devices/devices.types";
+import { PERMISSIONS } from "../features/auth/permission.constants";
+import { useAuth } from "../features/auth/useAuth";
 
 function formatDate(value: string | null): string {
   if (!value) return "Sin registro";
@@ -41,6 +43,8 @@ function getErrorMessage(error: unknown): string {
 }
 
 export function DevicesPage() {
+  const { hasPermission } = useAuth();
+  const canManageDevices = hasPermission(PERMISSIONS.DEVICES_MANAGE);
   const [devices, setDevices] = useState<Device[]>([]);
   const [selectedDevice, setSelectedDevice] = useState<Device | null>(null);
   const [createdDevice, setCreatedDevice] =
@@ -211,14 +215,12 @@ export function DevicesPage() {
             Actualizar
           </button>
 
-          <button
-            type="button"
-            className="button button--primary"
-            onClick={openCreateForm}
-          >
-            <Plus size={18} aria-hidden="true" />
-            Nuevo dispositivo
-          </button>
+          {canManageDevices && (
+            <button type="button" className="button button--primary" onClick={openCreateForm}>
+              <Plus size={18} aria-hidden="true" />
+              Nuevo dispositivo
+            </button>
+          )}
         </div>
       </div>
 
@@ -228,7 +230,7 @@ export function DevicesPage() {
         </div>
       )}
 
-      {isFormVisible && (
+      {canManageDevices && isFormVisible && (
         <section className="panel">
           <h3>{selectedDevice ? "Editar dispositivo" : "Registrar dispositivo"}</h3>
 
@@ -278,7 +280,7 @@ export function DevicesPage() {
                   <th>IP</th>
                   <th>Última conexión</th>
                   <th>Última sincronización</th>
-                  <th>Acciones</th>
+                  {canManageDevices && <th>Acciones</th>}
                 </tr>
               </thead>
               <tbody>
@@ -304,7 +306,7 @@ export function DevicesPage() {
                     <td>{device.ipAddress ?? "Sin registro"}</td>
                     <td>{formatDate(device.lastConnectionAt)}</td>
                     <td>{formatDate(device.lastSyncAt)}</td>
-                    <td>
+                    {canManageDevices && <td>
                       <div className="table-actions">
                         <button
                           type="button"
@@ -337,7 +339,7 @@ export function DevicesPage() {
                           </button>
                         )}
                       </div>
-                    </td>
+                    </td>}
                   </tr>
                 ))}
               </tbody>

@@ -4,14 +4,22 @@ export interface LoginRequest {
 }
 
 export interface AuthUser {
-  id: string;
+  userId: string;
+  firstName: string;
+  lastName: string;
   email: string;
   role: string;
+  mustChangePassword: boolean;
+  permissions: string[];
 }
 
-export interface LoginResponse {
+export interface LoginResponse extends AuthUser {
   token: string;
-  email: string;
-  role: string;
-  user: string;
+  user?: string;
+}
+
+export interface ChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
 }

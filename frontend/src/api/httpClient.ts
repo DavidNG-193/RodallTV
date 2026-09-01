@@ -1,5 +1,8 @@
 import axios from "axios";
 
+export const AUTH_UNAUTHORIZED_EVENT = "rodalltv:unauthorized";
+export const AUTH_FORBIDDEN_EVENT = "rodalltv:forbidden";
+
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
 if (!apiBaseUrl) {
@@ -32,6 +35,11 @@ httpClient.interceptors.response.use(
     if (error.response?.status === 401) {
       localStorage.removeItem("rodalltv_token");
       localStorage.removeItem("rodalltv_user");
+      window.dispatchEvent(new Event(AUTH_UNAUTHORIZED_EVENT));
+    }
+
+    if (error.response?.status === 403) {
+      window.dispatchEvent(new Event(AUTH_FORBIDDEN_EVENT));
     }
 
     return Promise.reject(error);

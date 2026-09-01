@@ -16,17 +16,16 @@ import {
   useNavigate,
 } from "react-router-dom";
 import { brandAssets } from "../config/brandAssets";
+import { getFirstAllowedRoute } from "../features/auth/getFirstAllowedRoute";
 import { useAuth } from "../features/auth/useAuth";
 import "../styles/login.css";
 
 interface LocationState {
-  from?: {
-    pathname?: string;
-  };
+  message?: string;
 }
 
 export function LoginPage() {
-  const { login, isAuthenticated } = useAuth();
+  const { login, user, isAuthenticated, isLoading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -37,8 +36,23 @@ export function LoginPage() {
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  if (isAuthenticated) {
-    return <Navigate to="/" replace />;
+  const locationState = location.state as LocationState | null;
+
+  if (isLoading) {
+    return <div className="route-loading">Validando sesión...</div>;
+  }
+
+  if (isAuthenticated && user) {
+    return (
+      <Navigate
+        to={
+          user.mustChangePassword
+            ? "/change-password"
+            : getFirstAllowedRoute(user.permissions)
+        }
+        replace
+      />
+    );
   }
 
   const handleSubmit = async (
@@ -49,14 +63,14 @@ export function LoginPage() {
     setIsSubmitting(true);
 
     try {
-      await login({
+      const authenticatedUser = await login({
         email: email.trim(),
         password,
       });
 
-      const state = location.state as LocationState | null;
-      const destination =
-        state?.from?.pathname ?? "/";
+      const destination = authenticatedUser.mustChangePassword
+        ? "/change-password"
+        : getFirstAllowedRoute(authenticatedUser.permissions);
 
       navigate(destination, {
         replace: true,
@@ -199,6 +213,12 @@ export function LoginPage() {
               role="alert"
             >
               {errorMessage}
+            </div>
+          )}
+
+          {!errorMessage && locationState?.message && (
+            <div className="login-alert login-alert--success" role="status">
+              {locationState.message}
             </div>
           )}
 

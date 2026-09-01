@@ -18,6 +18,8 @@ import type {
   UpdatePlaylistRequest,
 } from "../features/playlist/playlists.types";
 import { formatDateTime } from "../utils/fileFormatters";
+import { PERMISSIONS } from "../features/auth/permission.constants";
+import { useAuth } from "../features/auth/useAuth";
 
 function getErrorMessage(error: unknown): string {
   if (!axios.isAxiosError(error)) {
@@ -40,6 +42,8 @@ function getErrorMessage(error: unknown): string {
 }
 
 export function PlaylistsPage() {
+  const { hasPermission } = useAuth();
+  const canManagePlaylists = hasPermission(PERMISSIONS.PLAYLISTS_MANAGE);
   const navigate = useNavigate();
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [selectedPlaylist, setSelectedPlaylist] =
@@ -173,14 +177,14 @@ export function PlaylistsPage() {
             Actualizar
           </button>
 
-          <button
+          {canManagePlaylists && <button
             type="button"
             className="button button--primary"
             onClick={openCreateForm}
           >
             <Plus size={18} aria-hidden="true" />
             Nueva playlist
-          </button>
+          </button>}
         </div>
       </div>
 
@@ -190,7 +194,7 @@ export function PlaylistsPage() {
         </div>
       )}
 
-      {isFormVisible && (
+      {canManagePlaylists && isFormVisible && (
         <section className="panel">
           <div className="panel__heading">
             <h3>
@@ -258,23 +262,23 @@ export function PlaylistsPage() {
                     Contenido
                   </button>
 
-                  <button
+                  {canManagePlaylists && <button
                     type="button"
                     className="icon-button"
                     title="Editar playlist"
                     onClick={() => openEditForm(playlist)}
                   >
                     <Pencil size={17} aria-hidden="true" />
-                  </button>
+                  </button>}
 
-                  <button
+                  {canManagePlaylists && <button
                     type="button"
                     className="icon-button icon-button--danger"
                     title="Desactivar playlist"
                     onClick={() => void handleDeactivate(playlist)}
                   >
                     <Trash2 size={17} aria-hidden="true" />
-                  </button>
+                  </button>}
                 </div>
               </article>
             ))}

@@ -20,6 +20,8 @@ import type { Device } from "../features/devices/devices.types";
 import { playlistsService } from "../features/playlist/playlists.service";
 import type { Playlist } from "../features/playlist/playlists.types";
 import { formatDateTime } from "../utils/fileFormatters";
+import { PERMISSIONS } from "../features/auth/permission.constants";
+import { useAuth } from "../features/auth/useAuth";
 
 interface AssignmentPageData {
   assignments: PlaylistAssignment[];
@@ -51,12 +53,16 @@ function getErrorMessage(error: unknown): string {
   return "No fue posible completar la operación.";
 }
 
-async function fetchAssignmentData(): Promise<AssignmentPageData> {
-  const [assignments, devices, playlists] = await Promise.all([
-    assignmentsService.getAll(true),
-    devicesService.getAll("active"),
-    playlistsService.getAll(),
-  ]);
+async function fetchAssignmentData(
+  includeManagementData: boolean,
+): Promise<AssignmentPageData> {
+  const assignments = await assignmentsService.getAll(true);
+  const [devices, playlists] = includeManagementData
+    ? await Promise.all([
+        devicesService.getAll("active"),
+        playlistsService.getAll(),
+      ])
+    : [[], []];
 
   return {
     assignments: assignments.filter(
@@ -68,6 +74,8 @@ async function fetchAssignmentData(): Promise<AssignmentPageData> {
 }
 
 export function AssignmentsPage() {
+  const { hasPermission } = useAuth();
+  const canManageAssignments = hasPermission(PERMISSIONS.ASSIGNMENTS_MANAGE);
   const [assignments, setAssignments] =
     useState<PlaylistAssignment[]>([]);
   const [devices, setDevices] = useState<Device[]>([]);
@@ -90,18 +98,18 @@ export function AssignmentsPage() {
     setErrorMessage("");
 
     try {
-      applyData(await fetchAssignmentData());
+      applyData(await fetchAssignmentData(canManageAssignments));
     } catch (error) {
       setErrorMessage(getErrorMessage(error));
     } finally {
       setIsLoading(false);
     }
-  }, [applyData]);
+  }, [applyData, canManageAssignments]);
 
   useEffect(() => {
     let isCancelled = false;
 
-    void fetchAssignmentData()
+    void fetchAssignmentData(canManageAssignments)
       .then((data) => {
         if (!isCancelled) {
           applyData(data);
@@ -121,7 +129,7 @@ export function AssignmentsPage() {
     return () => {
       isCancelled = true;
     };
-  }, [applyData]);
+  }, [applyData, canManageAssignments]);
 
   const openCreateForm = () => {
     setSelectedAssignment(null);
@@ -199,14 +207,14 @@ export function AssignmentsPage() {
             Actualizar
           </button>
 
-          <button
+          {canManageAssignments && <button
             type="button"
             className="button button--primary"
             onClick={openCreateForm}
           >
             <Plus size={18} aria-hidden="true" />
             Nueva asignación
-          </button>
+          </button>}
         </div>
       </div>
 
@@ -216,7 +224,7 @@ export function AssignmentsPage() {
         </div>
       )}
 
-      {isFormVisible && (
+      {canManageAssignments && isFormVisible && (
         <section className="panel">
           <div className="panel__heading">
             <h3>
@@ -276,7 +284,7 @@ export function AssignmentsPage() {
                   <small>Por {assignment.assignedByEmail}</small>
                 </div>
 
-                <div className="assignment-card__actions">
+                {canManageAssignments && <div className="assignment-card__actions">
                   <button
                     type="button"
                     className="button button--secondary"
@@ -296,7 +304,7 @@ export function AssignmentsPage() {
                   >
                     <Unlink size={17} aria-hidden="true" />
                   </button>
-                </div>
+                </div>}
               </article>
             ))}
           </div>

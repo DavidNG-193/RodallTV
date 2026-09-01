@@ -163,6 +163,12 @@
   gap: 1rem;
 }
 
+.header__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
 .header__account strong,
 .header__account small {
   display: block;
@@ -235,6 +241,11 @@
 
   .header__account > div {
     display: none;
+  }
+
+  .header__actions {
+    flex-wrap: wrap;
+    justify-content: flex-end;
   }
 
   .page-content {

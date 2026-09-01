@@ -324,6 +324,57 @@ label {
   border: 1px solid #f6c7c3;
 }
 
+.route-loading {
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+  color: var(--color-gold-dark);
+  background: var(--color-background);
+  font-weight: 800;
+}
+
+.access-denied-page {
+  display: grid;
+  min-height: calc(100vh - 150px);
+  padding: 2rem;
+  place-items: center;
+}
+
+.access-denied-card {
+  width: min(100%, 560px);
+  padding: 2.5rem;
+  border: 1px solid var(--color-border);
+  border-top: 4px solid var(--color-gold);
+  border-radius: var(--radius-large);
+  text-align: center;
+  background: var(--color-white);
+  box-shadow: var(--shadow-card);
+}
+
+.access-denied-card__icon,
+.users-placeholder__icon {
+  display: inline-flex;
+  padding: 0.85rem;
+  border-radius: 50%;
+  color: var(--color-gold-dark);
+  background: #fef3c7;
+}
+
+.users-placeholder {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.users-placeholder > div {
+  flex: 1;
+}
+
+.users-placeholder h3,
+.users-placeholder p {
+  margin-bottom: 0.25rem;
+}
+
 .alert--success {
   color: #17643a;
   background: #eaf7ef;
