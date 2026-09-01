@@ -147,7 +147,7 @@ export function LoginPage() {
               onChange={(event) =>
                 setEmail(event.target.value)
               }
-              placeholder="usuario@acero.com"
+              placeholder="usuario@rodall.com"
               autoComplete="email"
               required
             />
@@ -236,8 +236,8 @@ export function LoginPage() {
 
         <footer className="login-card__footer">
           <p>
-            Si no tienes credenciales de acceso,
-            contacta al administrador del sistema.
+            Si no tiene credenciales u olvidó su contraseña,
+            contactar al área de TI.
           </p>
 
           <span>

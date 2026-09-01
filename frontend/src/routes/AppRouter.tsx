@@ -12,7 +12,7 @@ import { SyncLogsPage } from "../pages/SyncLogsPage";
 import { DailyReferencesPage } from "../features/references/DailyReferencesPage";
 import { AccessDeniedPage } from "../pages/AccessDeniedPage";
 import { ChangePasswordPage } from "../pages/ChangePasswordPage";
-import { UsersPage } from "../pages/UsersPage";
+import { UsersPage } from "../features/users/UsersPage";
 import { PERMISSIONS } from "../features/auth/permission.constants";
 import { AuthorizationStatusHandler } from "./AuthorizationStatusHandler";
 import { PasswordChangeGuard } from "./PasswordChangeGuard";

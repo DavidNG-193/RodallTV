@@ -15,7 +15,7 @@ export function AccessDeniedPage() {
         <p>Tu cuenta no tiene permisos para acceder a esta sección.</p>
         <Link className="button button--primary" to={getFirstAllowedRoute(user?.permissions ?? [])}>
           <ArrowLeft size={18} aria-hidden="true" />
-          Volver a una sección disponible
+          Volver
         </Link>
       </section>
     </div>
