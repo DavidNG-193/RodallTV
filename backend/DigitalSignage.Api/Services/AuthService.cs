@@ -150,4 +150,47 @@ public class AuthService
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
+
+    public async Task<ChangePasswordResult> ChangePasswordAsync(
+        Guid userId,
+        ChangePasswordRequestDto request)
+    {
+        var user = await _context.Users
+            .FirstOrDefaultAsync(u =>
+                u.Id == userId
+                && u.IsActive);
+
+        if (user is null)
+            return ChangePasswordResult.UserNotFound;
+
+        if (request.NewPassword != request.ConfirmPassword)
+            return ChangePasswordResult.PasswordsDoNotMatch;
+
+        var currentPasswordIsValid =
+            BCrypt.Net.BCrypt.Verify(
+                request.CurrentPassword,
+                user.PasswordHash);
+
+        if (!currentPasswordIsValid)
+            return ChangePasswordResult.InvalidCurrentPassword;
+
+        var isSamePassword =
+            BCrypt.Net.BCrypt.Verify(
+                request.NewPassword,
+                user.PasswordHash);
+
+        if (isSamePassword)
+            return ChangePasswordResult.SamePassword;
+
+        user.PasswordHash =
+            BCrypt.Net.BCrypt.HashPassword(
+                request.NewPassword);
+
+        user.MustChangePassword = false;
+        user.SessionVersion++;
+
+        await _context.SaveChangesAsync();
+
+        return ChangePasswordResult.Success;
+    }
 }

@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Http.Features;
 using DigitalSignage.Api.Authorization;
+using DigitalSignage.Api.Tools;
 using Microsoft.AspNetCore.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -241,6 +242,50 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+if (args.Contains("--reset-admin-password"))
+{
+    using var scope = app.Services.CreateScope();
+
+    var db = scope.ServiceProvider
+        .GetRequiredService<ApplicationDbContext>();
+
+    var email =
+        Environment.GetEnvironmentVariable(
+            "RODALL_RESET_ADMIN_EMAIL");
+
+    var password =
+        Environment.GetEnvironmentVariable(
+            "RODALL_RESET_ADMIN_PASSWORD");
+
+    if (string.IsNullOrWhiteSpace(email)
+        || string.IsNullOrWhiteSpace(password))
+    {
+        Console.Error.WriteLine(
+            "Faltan variables de recuperación.");
+        return;
+    }
+
+    if (password.Length is < 8 or > 100)
+    {
+        Console.Error.WriteLine(
+            "La contraseña temporal debe tener entre 8 y 100 caracteres.");
+        return;
+    }
+
+    var success =
+        await AdminPasswordResetTool.ResetAsync(
+            db,
+            email,
+            password);
+
+    Console.WriteLine(
+        success
+            ? "Contraseña administrativa restablecida."
+            : "No se encontró el administrador.");
+
+    return;
+}
 
 // Ejecutar seed inicial de base de datos
 using (var scope = app.Services.CreateScope())

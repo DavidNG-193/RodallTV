@@ -53,4 +53,51 @@ public class AuthController : ControllerBase
 
         return Ok(user);
     }
+
+    [Authorize]
+    [HttpPost("change-password")]
+    public async Task<IActionResult> ChangePassword(
+        [FromBody] ChangePasswordRequestDto request)
+    {
+        var userIdValue =
+            User.FindFirstValue(
+                ClaimTypes.NameIdentifier);
+
+        if (!Guid.TryParse(userIdValue, out var userId))
+            return Unauthorized();
+
+        var result =
+            await _authService.ChangePasswordAsync(
+                userId,
+                request);
+
+        return result switch
+        {
+            ChangePasswordResult.Success
+                => NoContent(),
+
+            ChangePasswordResult.UserNotFound
+                => Unauthorized(),
+
+            ChangePasswordResult.InvalidCurrentPassword
+                => BadRequest(new
+                {
+                    message = "La contraseña actual no es correcta."
+                }),
+
+            ChangePasswordResult.PasswordsDoNotMatch
+                => BadRequest(new
+                {
+                    message = "La nueva contraseña y su confirmación no coinciden."
+                }),
+
+            ChangePasswordResult.SamePassword
+                => BadRequest(new
+                {
+                    message = "La nueva contraseña debe ser diferente de la actual."
+                }),
+
+            _ => BadRequest()
+        };
+    }
 }
