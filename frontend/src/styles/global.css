@@ -266,7 +266,7 @@ label {
     font-weight: 700;
     margin-bottom: 6px;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-    background: linear-gradient(90deg, #b95629 3.5372%, #d1962e 16.3474%, #eae982 26.2788%, #d1962e 38.9683%, #f8f567 50.7655%, #d1962e 63.3107%, #f5f4a9 75.1884%, #d1962e 86.6952%, #b95629 3.5372%);
+    background: linear-gradient(90deg, #e99c05 3.5372%,  #f4ae00 16.3474%, #f8bf33 26.2788%, #f8ce19 38.9683%, #ffdc02 50.7655%, #f8ce19 63.3107%, #f8bf33 16.3474%, #f4ae00 86.6952%, #e99c05 3.5372%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -275,6 +275,7 @@ label {
   font-weight: 800;
   letter-spacing: 0.12em;
   text-transform: uppercase;
+  -webkit-text-stroke: .5px #cc921d;
 }
 
 .page-heading__actions,
