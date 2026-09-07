@@ -43,6 +43,7 @@ public sealed class AgentWeatherService : IAgentWeatherService
                 null,
                 null,
                 null,
+                null,
                 null);
         }
 
@@ -82,6 +83,9 @@ public sealed class AgentWeatherService : IAgentWeatherService
                 exception);
         }
 
+        WeatherPresentation presentation =
+            WeatherPresentationResolver.Resolve(weather);
+
         return new AgentWeatherResponseDto(
             true,
             setting.LocationName,
@@ -93,7 +97,8 @@ public sealed class AgentWeatherService : IAgentWeatherService
             weather.RelativeHumidityPercent,
             weather.PrecipitationMm,
             weather.WeatherCode,
-            WeatherCodeMapper.ToDescription(weather.WeatherCode),
+            presentation.DisplayWeatherCode,
+            presentation.Description,
             weather.WindSpeedKmh,
             weather.ObservationTime);
     }

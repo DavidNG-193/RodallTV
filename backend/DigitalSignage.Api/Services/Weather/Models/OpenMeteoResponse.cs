@@ -28,8 +28,20 @@ public sealed class OpenMeteoCurrent
     [JsonPropertyName("precipitation")]
     public double Precipitation { get; set; }
 
+    [JsonPropertyName("rain")]
+    public double Rain { get; set; }
+
+    [JsonPropertyName("showers")]
+    public double Showers { get; set; }
+
     [JsonPropertyName("weather_code")]
     public int WeatherCode { get; set; }
+
+    [JsonPropertyName("cloud_cover")]
+    public int CloudCover { get; set; }
+
+    [JsonPropertyName("is_day")]
+    public int IsDay { get; set; }
 
     [JsonPropertyName("wind_speed_10m")]
     public double WindSpeed { get; set; }

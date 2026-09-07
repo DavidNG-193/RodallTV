@@ -1,5 +1,5 @@
 import axios from "axios";
-import { RefreshCw } from "lucide-react";
+import { ChevronLeft, ChevronRight, RefreshCw } from "lucide-react";
 import {
   useCallback,
   useEffect,
@@ -12,6 +12,7 @@ import { devicesService } from "../features/devices/devices.service";
 import type { Device } from "../features/devices/devices.types";
 import { syncLogsService } from "../features/syncLogs/syncLogs.service";
 import type {
+  PagedSyncLogsResponse,
   SyncLog,
   SyncResult,
 } from "../features/syncLogs/syncLogs.types";
@@ -22,9 +23,11 @@ import {
 } from "../utils/syncLogFormatters";
 
 interface SyncLogPageData {
-  logs: SyncLog[];
+  logs: PagedSyncLogsResponse;
   devices: Device[];
 }
+
+const PAGE_SIZE = 20;
 
 function getErrorMessage(error: unknown): string {
   if (!axios.isAxiosError(error)) {
@@ -45,12 +48,14 @@ function getErrorMessage(error: unknown): string {
 async function fetchSyncLogData(
   deviceId: string,
   result: SyncResult | "",
+  page: number,
 ): Promise<SyncLogPageData> {
   const [logs, devices] = await Promise.all([
-    syncLogsService.getAll({
+    syncLogsService.getPaged({
       deviceId,
       result,
-      limit: 30,
+      page,
+      pageSize: PAGE_SIZE,
     }),
     devicesService.getAll("all"),
   ]);
@@ -63,6 +68,9 @@ export function SyncLogsPage() {
   const [devices, setDevices] = useState<Device[]>([]);
   const [deviceId, setDeviceId] = useState("");
   const [result, setResult] = useState<SyncResult | "">("");
+  const [page, setPage] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -71,24 +79,36 @@ export function SyncLogsPage() {
     setErrorMessage("");
 
     try {
-      const data = await fetchSyncLogData(deviceId, result);
-      setLogs(data.logs);
+      const data = await fetchSyncLogData(deviceId, result, page);
+      setLogs(data.logs.items);
       setDevices(data.devices);
+      setTotalItems(data.logs.totalItems);
+      setTotalPages(data.logs.totalPages);
+
+      if (data.logs.totalPages > 0 && page > data.logs.totalPages) {
+        setPage(data.logs.totalPages);
+      }
     } catch (error) {
       setErrorMessage(getErrorMessage(error));
     } finally {
       setIsLoading(false);
     }
-  }, [deviceId, result]);
+  }, [deviceId, page, result]);
 
   useEffect(() => {
     let isCancelled = false;
 
-    void fetchSyncLogData(deviceId, result)
+    void fetchSyncLogData(deviceId, result, page)
       .then((data) => {
         if (!isCancelled) {
-          setLogs(data.logs);
+          setLogs(data.logs.items);
           setDevices(data.devices);
+          setTotalItems(data.logs.totalItems);
+          setTotalPages(data.logs.totalPages);
+
+          if (data.logs.totalPages > 0 && page > data.logs.totalPages) {
+            setPage(data.logs.totalPages);
+          }
         }
       })
       .catch((error: unknown) => {
@@ -105,12 +125,13 @@ export function SyncLogsPage() {
     return () => {
       isCancelled = true;
     };
-  }, [deviceId, result]);
+  }, [deviceId, page, result]);
 
   const handleDeviceChange = (
     event: ChangeEvent<HTMLSelectElement>,
   ) => {
     setDeviceId(event.target.value);
+    setPage(1);
     setIsLoading(true);
     setErrorMessage("");
   };
@@ -119,6 +140,7 @@ export function SyncLogsPage() {
     event: ChangeEvent<HTMLSelectElement>,
   ) => {
     setResult(event.target.value as SyncResult | "");
+    setPage(1);
     setIsLoading(true);
     setErrorMessage("");
   };
@@ -196,8 +218,9 @@ export function SyncLogsPage() {
             description="No se encontraron registros para los filtros seleccionados."
           />
         ) : (
-          <div className="table-wrapper">
-            <table className="data-table">
+          <>
+            <div className="table-wrapper">
+              <table className="data-table">
               <thead>
                 <tr>
                   <th>Dispositivo</th>
@@ -239,8 +262,45 @@ export function SyncLogsPage() {
                   </tr>
                 ))}
               </tbody>
-            </table>
-          </div>
+              </table>
+            </div>
+
+            <footer className="media-pagination">
+              <span>
+                {totalItems} sincronización{totalItems === 1 ? "" : "es"}
+                {totalItems === 100 ? " más recientes" : ""}
+              </span>
+              <div>
+                <button
+                  type="button"
+                  className="icon-button"
+                  aria-label="Página anterior"
+                  disabled={page <= 1}
+                  onClick={() => {
+                    setIsLoading(true);
+                    setPage((value) => value - 1);
+                  }}
+                >
+                  <ChevronLeft size={18} aria-hidden="true" />
+                </button>
+                <span>
+                  Página {page} de {Math.max(totalPages, 1)}
+                </span>
+                <button
+                  type="button"
+                  className="icon-button"
+                  aria-label="Página siguiente"
+                  disabled={page >= totalPages}
+                  onClick={() => {
+                    setIsLoading(true);
+                    setPage((value) => value + 1);
+                  }}
+                >
+                  <ChevronRight size={18} aria-hidden="true" />
+                </button>
+              </div>
+            </footer>
+          </>
         )}
       </section>
     </section>

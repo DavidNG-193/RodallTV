@@ -11,6 +11,7 @@ public sealed record AgentWeatherResponseDto(
     int? RelativeHumidityPercent,
     double? PrecipitationMm,
     int? WeatherCode,
+    int? DisplayWeatherCode,
     string? Description,
     double? WindSpeedKmh,
     DateTime? ObservationTime);

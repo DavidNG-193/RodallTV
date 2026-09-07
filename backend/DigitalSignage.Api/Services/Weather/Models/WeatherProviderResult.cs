@@ -8,6 +8,10 @@ public sealed record WeatherProviderResult(
     double ApparentTemperatureC,
     int RelativeHumidityPercent,
     double PrecipitationMm,
+    double RainMm,
+    double ShowersMm,
     int WeatherCode,
+    int CloudCoverPercent,
+    bool IsDay,
     double WindSpeedKmh,
     DateTime ObservationTime);

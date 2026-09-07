@@ -1,12 +1,13 @@
 import axios from "axios";
 import {
-  ArrowDown,
   ArrowLeft,
-  ArrowUp,
+  GripVertical,
   Pencil,
   Plus,
   RefreshCw,
+  Save,
   Trash2,
+  Undo2,
 } from "lucide-react";
 import {
   useCallback,
@@ -17,11 +18,11 @@ import { useNavigate, useParams } from "react-router-dom";
 import { EmptyState } from "../components/common/EmptyState";
 import { LoadingState } from "../components/common/LoadingState";
 import type { MediaItem } from "../features/media/media.types";
-import { mediaService } from "../features/media/media.service";
+import { MediaThumbnail } from "../features/media/MediaThumbnail";
 import { PlaylistItemForm } from "../features/playlist/PlaylistItemForm";
+import { PlaylistMediaPickerModal } from "../features/playlist/PlaylistMediaPickerModal";
 import { playlistsService } from "../features/playlist/playlists.service";
 import type {
-  CreatePlaylistItemRequest,
   Playlist,
   PlaylistItem,
   UpdatePlaylistItemRequest,
@@ -32,12 +33,20 @@ import { useAuth } from "../features/auth/useAuth";
 interface PlaylistDetailData {
   playlist: Playlist;
   items: PlaylistItem[];
-  media: MediaItem[];
+}
+
+interface DraftPlaylistItem extends PlaylistItem {
+  isNew?: boolean;
 }
 
 function getErrorMessage(error: unknown): string {
   if (!axios.isAxiosError(error)) {
     return "Ocurrió un error inesperado.";
+  }
+
+  const apiMessage = error.response?.data?.message;
+  if (typeof apiMessage === "string" && apiMessage.trim()) {
+    return apiMessage;
   }
 
   if (error.response?.status === 400) {
@@ -61,12 +70,10 @@ function getErrorMessage(error: unknown): string {
 
 async function fetchPlaylistDetail(
   playlistId: string,
-  includeManagementData: boolean,
 ): Promise<PlaylistDetailData> {
-  const [playlist, items, media] = await Promise.all([
+  const [playlist, items] = await Promise.all([
     playlistsService.getById(playlistId),
     playlistsService.getItems(playlistId),
-    includeManagementData ? mediaService.getAll() : Promise.resolve([]),
   ]);
 
   return {
@@ -74,7 +81,6 @@ async function fetchPlaylistDetail(
     items: [...items].sort(
       (first, second) => first.position - second.position,
     ),
-    media,
   };
 }
 
@@ -84,19 +90,22 @@ export function PlaylistDetailPage() {
   const { playlistId } = useParams<{ playlistId: string }>();
   const navigate = useNavigate();
   const [playlist, setPlaylist] = useState<Playlist | null>(null);
-  const [items, setItems] = useState<PlaylistItem[]>([]);
-  const [media, setMedia] = useState<MediaItem[]>([]);
+  const [items, setItems] = useState<DraftPlaylistItem[]>([]);
   const [selectedItem, setSelectedItem] =
     useState<PlaylistItem | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isFormVisible, setIsFormVisible] = useState(false);
+  const [isMediaPickerVisible, setIsMediaPickerVisible] = useState(false);
+  const [hasPendingChanges, setHasPendingChanges] = useState(false);
+  const [draggedItemId, setDraggedItemId] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState("");
 
   const applyData = useCallback((data: PlaylistDetailData) => {
     setPlaylist(data.playlist);
     setItems(data.items);
-    setMedia(data.media);
+    setHasPendingChanges(false);
+    setDraggedItemId(null);
   }, []);
 
   const loadData = useCallback(async () => {
@@ -108,13 +117,13 @@ export function PlaylistDetailPage() {
     setErrorMessage("");
 
     try {
-      applyData(await fetchPlaylistDetail(playlistId, canManagePlaylists));
+      applyData(await fetchPlaylistDetail(playlistId));
     } catch (error) {
       setErrorMessage(getErrorMessage(error));
     } finally {
       setIsLoading(false);
     }
-  }, [applyData, canManagePlaylists, playlistId]);
+  }, [applyData, playlistId]);
 
   useEffect(() => {
     if (!playlistId) {
@@ -123,7 +132,7 @@ export function PlaylistDetailPage() {
 
     let isCancelled = false;
 
-    void fetchPlaylistDetail(playlistId, canManagePlaylists)
+    void fetchPlaylistDetail(playlistId)
       .then((data) => {
         if (!isCancelled) {
           applyData(data);
@@ -143,12 +152,32 @@ export function PlaylistDetailPage() {
     return () => {
       isCancelled = true;
     };
-  }, [applyData, canManagePlaylists, playlistId]);
+  }, [applyData, playlistId]);
+
+  useEffect(() => {
+    if (!hasPendingChanges) return;
+
+    const warnBeforeUnload = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+    };
+    window.addEventListener("beforeunload", warnBeforeUnload);
+    return () => window.removeEventListener("beforeunload", warnBeforeUnload);
+  }, [hasPendingChanges]);
+
+  const handleBack = () => {
+    if (
+      hasPendingChanges
+      && !window.confirm("Hay cambios sin guardar. ¿Deseas descartarlos y salir?")
+    ) {
+      return;
+    }
+    navigate("/playlists");
+  };
 
   const openAddForm = () => {
     setSelectedItem(null);
     setErrorMessage("");
-    setIsFormVisible(true);
+    setIsMediaPickerVisible(true);
   };
 
   const openEditForm = (item: PlaylistItem) => {
@@ -162,46 +191,48 @@ export function PlaylistDetailPage() {
     setIsFormVisible(false);
   };
 
-  const handleSubmit = async (
-    request:
-      | CreatePlaylistItemRequest
-      | UpdatePlaylistItemRequest,
-  ) => {
-    if (!playlistId) {
+  const handleSubmit = async (request: UpdatePlaylistItemRequest) => {
+    if (!selectedItem) {
       return;
     }
 
-    setIsSubmitting(true);
-    setErrorMessage("");
-
-    try {
-      if (selectedItem) {
-        await playlistsService.updateItem(
-          playlistId,
-          selectedItem.id,
-          request as UpdatePlaylistItemRequest,
-        );
-      } else {
-        await playlistsService.addItem(
-          playlistId,
-          request as CreatePlaylistItemRequest,
-        );
-      }
-
-      await loadData();
-      closeForm();
-    } catch (error) {
-      setErrorMessage(getErrorMessage(error));
-    } finally {
-      setIsSubmitting(false);
+    if (selectedItem.customDurationSeconds !== request.customDurationSeconds) {
+      setItems((current) => current.map((item) =>
+        item.id === selectedItem.id
+          ? { ...item, customDurationSeconds: request.customDurationSeconds ?? null }
+          : item,
+      ));
+      setHasPendingChanges(true);
     }
+    closeForm();
+  };
+
+  const handleAddMedia = (
+    selectedMedia: MediaItem[],
+    customDurationSeconds: number | null,
+  ) => {
+    const createdAt = new Date().toISOString();
+    setItems((current) => [
+      ...current,
+      ...selectedMedia.map((mediaItem, index): DraftPlaylistItem => ({
+        id: crypto.randomUUID(),
+        playlistId: playlistId ?? "",
+        mediaId: mediaItem.id,
+        originalFileName: mediaItem.originalFileName,
+        storedFileName: mediaItem.storedFileName,
+        mediaType: mediaItem.mediaType,
+        mimeType: mediaItem.mimeType,
+        position: current.length + index + 1,
+        customDurationSeconds,
+        createdAt,
+        isNew: true,
+      })),
+    ]);
+    setHasPendingChanges(true);
+    setIsMediaPickerVisible(false);
   };
 
   const handleRemove = async (item: PlaylistItem) => {
-    if (!playlistId) {
-      return;
-    }
-
     const confirmed = window.confirm(
       `¿Deseas eliminar "${item.originalFileName}" de la playlist?`,
     );
@@ -210,56 +241,52 @@ export function PlaylistDetailPage() {
       return;
     }
 
-    setIsSubmitting(true);
-    setErrorMessage("");
-
-    try {
-      await playlistsService.removeItem(playlistId, item.id);
-      await loadData();
-    } catch (error) {
-      setErrorMessage(getErrorMessage(error));
-    } finally {
-      setIsSubmitting(false);
-    }
+    setItems((current) => current.filter((currentItem) => currentItem.id !== item.id));
+    setHasPendingChanges(true);
   };
 
-  const moveItem = async (
-    currentIndex: number,
-    direction: -1 | 1,
+  const moveItemLocally = (
+    sourceId: string,
+    destinationId: string,
+    placeAfterDestination: boolean,
   ) => {
-    if (!playlistId) {
-      return;
-    }
+    if (sourceId === destinationId) return;
 
-    const destinationIndex = currentIndex + direction;
+    const sourceIndex = items.findIndex((item) => item.id === sourceId);
+    const destinationIndex = items.findIndex((item) => item.id === destinationId);
+    if (sourceIndex < 0 || destinationIndex < 0) return;
 
-    if (
-      destinationIndex < 0 ||
-      destinationIndex >= items.length
-    ) {
-      return;
-    }
+    let insertionIndex = destinationIndex + (placeAfterDestination ? 1 : 0);
+    if (sourceIndex < insertionIndex) insertionIndex -= 1;
+    if (sourceIndex === insertionIndex) return;
 
-    const previousItems = items;
     const reordered = [...items];
-
-    [reordered[currentIndex], reordered[destinationIndex]] = [
-      reordered[destinationIndex],
-      reordered[currentIndex],
-    ];
-
+    const [movedItem] = reordered.splice(sourceIndex, 1);
+    reordered.splice(insertionIndex, 0, movedItem);
     setItems(reordered);
+    setHasPendingChanges(true);
+  };
+
+  const handleSaveChanges = async () => {
+    if (!playlistId || !playlist || !hasPendingChanges) return;
+
     setIsSubmitting(true);
     setErrorMessage("");
 
     try {
-      await playlistsService.reorderItems(playlistId, {
-        orderedItemIds: reordered.map((item) => item.id),
+      const result = await playlistsService.saveComposition(playlistId, {
+        expectedVersion: playlist.version,
+        items: items.map((item) => ({
+          id: item.isNew ? null : item.id,
+          mediaId: item.mediaId,
+          customDurationSeconds: item.customDurationSeconds,
+        })),
       });
-
-      await loadData();
+      setItems(result.items);
+      setPlaylist({ ...playlist, version: result.version });
+      setHasPendingChanges(false);
+      setDraggedItemId(null);
     } catch (error) {
-      setItems(previousItems);
       setErrorMessage(getErrorMessage(error));
     } finally {
       setIsSubmitting(false);
@@ -267,10 +294,7 @@ export function PlaylistDetailPage() {
   };
 
   const getMediaName = (item: PlaylistItem): string =>
-    item.originalFileName ||
-    media.find((mediaItem) => mediaItem.id === item.mediaId)
-      ?.originalFileName ||
-    "Archivo no disponible";
+    item.originalFileName || "Archivo no disponible";
 
   if (!playlistId) {
     return (
@@ -289,6 +313,7 @@ export function PlaylistDetailPage() {
           <p>
             {playlist?.description ?? "Sin descripción"} · Versión{" "}
             {playlist?.version ?? "—"}
+            {hasPendingChanges && <span className="playlist-order-status">Cambios sin guardar</span>}
           </p>
         </div>
 
@@ -296,7 +321,7 @@ export function PlaylistDetailPage() {
           <button
             type="button"
             className="button button--secondary"
-            onClick={() => navigate("/playlists")}
+            onClick={handleBack}
           >
             <ArrowLeft size={18} aria-hidden="true" />
             Volver
@@ -306,16 +331,37 @@ export function PlaylistDetailPage() {
             type="button"
             className="button button--secondary"
             onClick={() => void loadData()}
+            disabled={hasPendingChanges || isSubmitting}
           >
             <RefreshCw size={18} aria-hidden="true" />
             Actualizar
           </button>
 
+          {canManagePlaylists && hasPendingChanges && <button
+            type="button"
+            className="button button--secondary"
+            onClick={() => void loadData()}
+            disabled={isSubmitting}
+          >
+            <Undo2 size={18} aria-hidden="true" />
+            Descartar cambios
+          </button>}
+
           {canManagePlaylists && <button
             type="button"
             className="button button--primary"
+            onClick={() => void handleSaveChanges()}
+            disabled={!hasPendingChanges || isSubmitting}
+          >
+            <Save size={18} aria-hidden="true" />
+            {isSubmitting && hasPendingChanges ? "Guardando..." : "Guardar cambios"}
+          </button>}
+
+          {canManagePlaylists && <button
+            type="button"
+            className="button button--secondary"
             onClick={openAddForm}
-            disabled={!playlist}
+            disabled={!playlist || isSubmitting}
           >
             <Plus size={18} aria-hidden="true" />
             Agregar contenido
@@ -329,13 +375,11 @@ export function PlaylistDetailPage() {
         </div>
       )}
 
-      {canManagePlaylists && isFormVisible && (
+      {canManagePlaylists && isFormVisible && selectedItem && (
         <section className="panel">
           <div className="panel__heading">
             <h3>
-              {selectedItem
-                ? "Editar duración"
-                : "Agregar contenido"}
+              Editar duración
             </h3>
             <p>
               La duración personalizada es opcional y debe ser mayor
@@ -344,7 +388,6 @@ export function PlaylistDetailPage() {
           </div>
 
           <PlaylistItemForm
-            media={media}
             item={selectedItem}
             isSubmitting={isSubmitting}
             onSubmit={handleSubmit}
@@ -362,11 +405,39 @@ export function PlaylistDetailPage() {
             description="Agrega imágenes o videos para comenzar."
           />
         ) : (
-          <div className="playlist-item-list">
+          <div className={`playlist-item-list${hasPendingChanges ? " playlist-item-list--pending" : ""}`}>
             {items.map((item, index) => (
-              <article className="playlist-item-row" key={item.id}>
-                <span className="playlist-item-row__position">
-                  {index + 1}
+              <article
+                className={`playlist-item-row${draggedItemId === item.id ? " playlist-item-row--dragging" : ""}`}
+                key={item.id}
+                draggable={canManagePlaylists && !isSubmitting}
+                onDragStart={(event) => {
+                  setDraggedItemId(item.id);
+                  event.dataTransfer.effectAllowed = "move";
+                  event.dataTransfer.setData("text/plain", item.id);
+                }}
+                onDragOver={(event) => {
+                  if (!canManagePlaylists || !draggedItemId) return;
+                  event.preventDefault();
+                  event.dataTransfer.dropEffect = "move";
+                  const bounds = event.currentTarget.getBoundingClientRect();
+                  moveItemLocally(
+                    draggedItemId,
+                    item.id,
+                    event.clientY > bounds.top + bounds.height / 2,
+                  );
+                }}
+                onDrop={(event) => {
+                  event.preventDefault();
+                  setDraggedItemId(null);
+                }}
+                onDragEnd={() => setDraggedItemId(null)}
+              >
+                {canManagePlaylists && <span className="playlist-item-row__drag" title="Arrastra para cambiar la posición" aria-hidden="true"><GripVertical size={20} /></span>}
+
+                <span className="playlist-item-row__thumbnail">
+                  <MediaThumbnail item={{ id: item.mediaId, mediaType: item.mediaType }} />
+                  <span className="playlist-item-row__position">{index + 1}</span>
                 </span>
 
                 <div className="playlist-item-row__content">
@@ -380,28 +451,6 @@ export function PlaylistDetailPage() {
                 </div>
 
                 {canManagePlaylists && <div className="playlist-item-row__actions">
-                  <button
-                    type="button"
-                    className="icon-button"
-                    title="Mover arriba"
-                    disabled={isSubmitting || index === 0}
-                    onClick={() => void moveItem(index, -1)}
-                  >
-                    <ArrowUp size={17} aria-hidden="true" />
-                  </button>
-
-                  <button
-                    type="button"
-                    className="icon-button"
-                    title="Mover abajo"
-                    disabled={
-                      isSubmitting || index === items.length - 1
-                    }
-                    onClick={() => void moveItem(index, 1)}
-                  >
-                    <ArrowDown size={17} aria-hidden="true" />
-                  </button>
-
                   <button
                     type="button"
                     className="icon-button"
@@ -427,6 +476,13 @@ export function PlaylistDetailPage() {
           </div>
         )}
       </section>
+
+      {canManagePlaylists && isMediaPickerVisible && (
+        <PlaylistMediaPickerModal
+          onClose={() => setIsMediaPickerVisible(false)}
+          onAdd={handleAddMedia}
+        />
+      )}
     </section>
   );
 }

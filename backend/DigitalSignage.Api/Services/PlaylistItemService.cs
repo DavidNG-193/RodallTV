@@ -190,6 +190,162 @@ public class PlaylistItemService
         return true;
     }
 
+    public async Task<SavePlaylistItemsResponseDto?> SaveCompositionAsync(
+        Guid playlistId,
+        SavePlaylistItemsRequestDto request)
+    {
+        var playlist = await _context.Playlists
+            .FirstOrDefaultAsync(p => p.Id == playlistId && p.IsActive);
+
+        if (playlist is null)
+        {
+            return null;
+        }
+
+        if (playlist.Version != request.ExpectedVersion)
+        {
+            throw new PlaylistVersionConflictException(
+                "La playlist cambió desde que se abrió. Actualiza la página antes de guardar.");
+        }
+
+        if (request.Items.Any(item => item.MediaId == Guid.Empty))
+        {
+            throw new InvalidOperationException(
+                "Todos los elementos deben indicar un archivo multimedia.");
+        }
+
+        foreach (SavePlaylistItemDto requestedItem in request.Items)
+        {
+            ValidateDuration(requestedItem.CustomDurationSeconds);
+        }
+
+        List<Guid> requestedExistingIds = request.Items
+            .Where(item => item.Id.HasValue)
+            .Select(item => item.Id!.Value)
+            .ToList();
+
+        if (requestedExistingIds.Any(id => id == Guid.Empty)
+            || requestedExistingIds.Distinct().Count() != requestedExistingIds.Count)
+        {
+            throw new InvalidOperationException(
+                "La composición contiene identificadores repetidos o inválidos.");
+        }
+
+        List<PlaylistItem> existingItems = await _context.PlaylistItems
+            .Include(item => item.Media)
+            .Where(item => item.PlaylistId == playlistId)
+            .OrderBy(item => item.Position)
+            .ToListAsync();
+
+        Dictionary<Guid, PlaylistItem> existingById = existingItems
+            .ToDictionary(item => item.Id);
+
+        foreach (SavePlaylistItemDto requestedItem in request.Items
+                     .Where(item => item.Id.HasValue))
+        {
+            if (!existingById.TryGetValue(requestedItem.Id!.Value, out var existing)
+                || existing.MediaId != requestedItem.MediaId)
+            {
+                throw new InvalidOperationException(
+                    "Uno o más elementos no pertenecen a la playlist.");
+            }
+        }
+
+        List<Guid> newMediaIds = request.Items
+            .Where(item => !item.Id.HasValue)
+            .Select(item => item.MediaId)
+            .Distinct()
+            .ToList();
+
+        Dictionary<Guid, Media> newMediaById = await _context.MediaFiles
+            .Where(media => newMediaIds.Contains(media.Id) && media.IsActive)
+            .ToDictionaryAsync(media => media.Id);
+
+        if (newMediaById.Count != newMediaIds.Count)
+        {
+            throw new InvalidOperationException(
+                "Uno o más archivos multimedia no existen o están inactivos.");
+        }
+
+        bool hasChanges = existingItems.Count != request.Items.Count
+            || request.Items.Select((requested, index) => new
+                {
+                    Requested = requested,
+                    Existing = index < existingItems.Count
+                        ? existingItems[index]
+                        : null
+                })
+                .Any(pair =>
+                    pair.Existing is null
+                    || pair.Requested.Id != pair.Existing.Id
+                    || pair.Requested.MediaId != pair.Existing.MediaId
+                    || pair.Requested.CustomDurationSeconds
+                        != pair.Existing.CustomDurationSeconds);
+
+        if (!hasChanges)
+        {
+            return new SavePlaylistItemsResponseDto
+            {
+                Version = playlist.Version,
+                Items = existingItems.Select(item => Map(item, item.Media)).ToList()
+            };
+        }
+
+        await using var transaction = await _context.Database.BeginTransactionAsync();
+
+        for (var index = 0; index < existingItems.Count; index++)
+        {
+            existingItems[index].Position = -(index + 1);
+        }
+
+        await _context.SaveChangesAsync();
+
+        HashSet<Guid> retainedIds = requestedExistingIds.ToHashSet();
+        _context.PlaylistItems.RemoveRange(
+            existingItems.Where(item => !retainedIds.Contains(item.Id)));
+
+        var finalItems = new List<PlaylistItem>(request.Items.Count);
+        for (var index = 0; index < request.Items.Count; index++)
+        {
+            SavePlaylistItemDto requestedItem = request.Items[index];
+            PlaylistItem item;
+
+            if (requestedItem.Id.HasValue)
+            {
+                item = existingById[requestedItem.Id.Value];
+                item.CustomDurationSeconds = requestedItem.CustomDurationSeconds;
+            }
+            else
+            {
+                item = new PlaylistItem
+                {
+                    Id = Guid.NewGuid(),
+                    PlaylistId = playlistId,
+                    MediaId = requestedItem.MediaId,
+                    CustomDurationSeconds = requestedItem.CustomDurationSeconds,
+                    CreatedAt = DateTime.UtcNow,
+                    Media = newMediaById[requestedItem.MediaId]
+                };
+                _context.PlaylistItems.Add(item);
+            }
+
+            item.Position = index + 1;
+            finalItems.Add(item);
+        }
+
+        playlist.Version += 1;
+        playlist.UpdatedAt = DateTime.UtcNow;
+
+        await _context.SaveChangesAsync();
+        await transaction.CommitAsync();
+
+        return new SavePlaylistItemsResponseDto
+        {
+            Version = playlist.Version,
+            Items = finalItems.Select(item => Map(item, item.Media)).ToList()
+        };
+    }
+
     public async Task<bool> DeleteAsync(Guid playlistId, Guid itemId)
     {
         var playlist = await _context.Playlists

@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using DigitalSignage.Api.DTOs.Media;
 using DigitalSignage.Api.Services;
+using DigitalSignage.Api.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -28,6 +29,28 @@ public class MediaController : ControllerBase
             mediaFolderId);
 
         return Ok(media);
+    }
+
+    [HttpGet("paged")]
+    public async Task<IActionResult> GetPaged(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 24,
+        [FromQuery] string? search = null,
+        [FromQuery] string? mediaType = null,
+        [FromQuery] Guid? mediaFolderId = null,
+        [FromQuery] bool rootOnly = false,
+        [FromQuery] string sort = "recent")
+    {
+        var result = await _mediaService.GetPagedAsync(
+            page,
+            pageSize,
+            search,
+            mediaType,
+            mediaFolderId,
+            rootOnly,
+            sort);
+
+        return Ok(result);
     }
 
     [HttpGet("{id:guid}")]
@@ -63,6 +86,25 @@ public class MediaController : ControllerBase
         {
             return BadRequest(new { message = ex.Message });
         }
+    }
+
+    [HttpGet("{id:guid}/thumbnail")]
+    public async Task<IActionResult> GetThumbnail(
+        Guid id,
+        CancellationToken cancellationToken)
+    {
+        var thumbnail = await _mediaService.GetThumbnailAsync(id, cancellationToken);
+
+        if (thumbnail is null)
+        {
+            return NotFound();
+        }
+
+        Response.Headers.CacheControl = "private, max-age=604800";
+        return PhysicalFile(
+            thumbnail.PhysicalPath,
+            thumbnail.ContentType,
+            enableRangeProcessing: true);
     }
 
     [HttpPost]
@@ -106,5 +148,22 @@ public class MediaController : ControllerBase
     {
         bool deleted = await _mediaService.DeleteAsync(id);
         return deleted ? NoContent() : NotFound();
+    }
+
+    [HttpPut("{id:guid}")]
+    [HasPermission(PermissionCodes.MediaManage)]
+    public async Task<IActionResult> Update(
+        Guid id,
+        UpdateMediaRequestDto request)
+    {
+        try
+        {
+            var media = await _mediaService.UpdateAsync(id, request);
+            return media is null ? NotFound() : Ok(media);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 }

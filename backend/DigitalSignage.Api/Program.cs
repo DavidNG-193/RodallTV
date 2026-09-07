@@ -33,6 +33,7 @@ builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<DeviceService>();
 builder.Services.AddScoped<MediaFolderService>();
 builder.Services.AddScoped<MediaService>();
+builder.Services.AddScoped<MediaThumbnailService>();
 builder.Services.AddScoped<PlaylistService>();
 builder.Services.AddScoped<PlaylistItemService>();
 builder.Services.AddScoped<PlaylistAssignmentService>();
@@ -122,8 +123,23 @@ builder.Services.AddCors(options =>
 });
 
 
-builder.Services.Configure<BanxicoOptions>(
-    builder.Configuration.GetSection(BanxicoOptions.SectionName));
+builder.Services.AddOptions<BanxicoOptions>()
+    .Bind(builder.Configuration.GetSection(BanxicoOptions.SectionName))
+    .Validate(
+        options => options.CacheMinutes > 0,
+        "Banxico:CacheMinutes debe ser mayor que cero.")
+    .Validate(
+        options => options.RequestTimeoutSeconds > 0,
+        "Banxico:RequestTimeoutSeconds debe ser mayor que cero.")
+    .Validate(
+        options => options.StaleCacheHours > 0,
+        "Banxico:StaleCacheHours debe ser mayor que cero.")
+    .Validate(
+        options =>
+            options.RetryDelayMinutes is { Length: > 0 } &&
+            options.RetryDelayMinutes.All(delay => delay > 0),
+        "Banxico:RetryDelayMinutes debe contener tiempos positivos.")
+    .ValidateOnStart();
 
 builder.Services.AddMemoryCache();
 

@@ -7,6 +7,8 @@ namespace DigitalSignage.Api.Services;
 
 public class SyncLogService
 {
+    private const int MaxRecentLogs = 100;
+
     private static readonly string[] AllowedResults =
     {
         "Success", "Failed", "NoChanges"
@@ -60,6 +62,71 @@ public class SyncLogService
                 DeletedFilesCount = log.DeletedFilesCount
             })
             .ToListAsync();
+    }
+
+    public async Task<PagedSyncLogsResponseDto> GetPagedAsync(
+        Guid? deviceId = null,
+        string? result = null,
+        int page = 1,
+        int pageSize = 20)
+    {
+        page = Math.Max(page, 1);
+        pageSize = Math.Clamp(pageSize, 1, MaxRecentLogs);
+
+        IQueryable<SyncLog> query = _context.SyncLogs
+            .AsNoTracking();
+
+        if (deviceId.HasValue)
+        {
+            query = query.Where(log => log.DeviceId == deviceId.Value);
+        }
+
+        if (!string.IsNullOrWhiteSpace(result))
+        {
+            string normalizedResult = NormalizeResult(result);
+            query = query.Where(log => log.Result == normalizedResult);
+        }
+
+        int matchingItems = await query.CountAsync();
+        int totalItems = Math.Min(matchingItems, MaxRecentLogs);
+        int offset = (page - 1) * pageSize;
+
+        List<SyncLogResponseDto> items = offset >= totalItems
+            ? []
+            : await query
+                .OrderByDescending(log => log.StartedAt)
+                .ThenByDescending(log => log.Id)
+                .Skip(offset)
+                .Take(Math.Min(pageSize, totalItems - offset))
+                .Select(log => new SyncLogResponseDto
+                {
+                    Id = log.Id,
+                    DeviceId = log.DeviceId,
+                    DeviceName = log.Device.Name,
+                    PlaylistId = log.PlaylistId,
+                    PlaylistName = log.Playlist != null
+                        ? log.Playlist.Name
+                        : null,
+                    SyncedVersion = log.SyncedVersion,
+                    StartedAt = log.StartedAt,
+                    FinishedAt = log.FinishedAt,
+                    Result = log.Result,
+                    Message = log.Message,
+                    DownloadedFilesCount = log.DownloadedFilesCount,
+                    DeletedFilesCount = log.DeletedFilesCount
+                })
+                .ToListAsync();
+
+        return new PagedSyncLogsResponseDto
+        {
+            Items = items,
+            Page = page,
+            PageSize = pageSize,
+            TotalItems = totalItems,
+            TotalPages = totalItems == 0
+                ? 0
+                : (int)Math.Ceiling(totalItems / (double)pageSize)
+        };
     }
 
     public async Task<SyncLogResponseDto?> GetByIdAsync(Guid id)

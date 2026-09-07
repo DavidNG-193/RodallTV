@@ -17,3 +17,11 @@ export interface SyncLog {
   downloadedFilesCount: number;
   deletedFilesCount: number;
 }
+
+export interface PagedSyncLogsResponse {
+  items: SyncLog[];
+  page: number;
+  pageSize: number;
+  totalItems: number;
+  totalPages: number;
+}

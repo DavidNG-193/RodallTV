@@ -47,3 +47,19 @@ export interface UpdatePlaylistItemRequest {
 export interface ReorderPlaylistItemsRequest {
   orderedItemIds: string[];
 }
+
+export interface SavePlaylistCompositionItem {
+  id: string | null;
+  mediaId: string;
+  customDurationSeconds: number | null;
+}
+
+export interface SavePlaylistCompositionRequest {
+  expectedVersion: number;
+  items: SavePlaylistCompositionItem[];
+}
+
+export interface SavePlaylistCompositionResponse {
+  version: number;
+  items: PlaylistItem[];
+}

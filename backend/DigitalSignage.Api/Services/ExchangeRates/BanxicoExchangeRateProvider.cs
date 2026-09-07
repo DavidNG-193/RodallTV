@@ -1,3 +1,5 @@
+using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using DigitalSignage.Api.Configuration;
 using DigitalSignage.Api.Services.ExchangeRates.Models;
@@ -8,6 +10,11 @@ namespace DigitalSignage.Api.Services.ExchangeRates;
 
 public sealed class BanxicoExchangeRateProvider : IExchangeRateProvider
 {
+    private const string CacheKey = "banxico:latest:catalog";
+    private const string FailureCacheKey = "banxico:latest:failure";
+    private static readonly ConcurrentDictionary<string, SemaphoreSlim>
+        RefreshLocks = new();
+
     private readonly HttpClient _httpClient;
     private readonly IMemoryCache _memoryCache;
     private readonly BanxicoOptions _options;
@@ -29,13 +36,13 @@ public sealed class BanxicoExchangeRateProvider : IExchangeRateProvider
         IReadOnlyCollection<string> seriesIds,
         CancellationToken cancellationToken)
     {
-        string[] normalized = seriesIds
+        string[] requestedSeries = seriesIds
             .Select(x => x.Trim().ToUpperInvariant())
             .Distinct()
             .OrderBy(x => x)
             .ToArray();
 
-        if (normalized.Length == 0)
+        if (requestedSeries.Length == 0)
         {
             DateTime now = DateTime.UtcNow;
 
@@ -46,60 +53,174 @@ public sealed class BanxicoExchangeRateProvider : IExchangeRateProvider
                 new Dictionary<string, ExchangeRateValue>());
         }
 
-        string cacheKey = $"banxico:latest:{string.Join(",", normalized)}";
+        string[] unsupported = requestedSeries
+            .Where(seriesId =>
+                !ExchangeRateSeriesCatalog.TryGet(seriesId, out _))
+            .ToArray();
 
-        if (_memoryCache.TryGetValue(
-            cacheKey,
-            out ExchangeRateFetchResult? cached)
-            && cached is not null
-            && cached.ExpiresAtUtc > DateTime.UtcNow)
+        if (unsupported.Length > 0)
+        {
+            throw new InvalidOperationException(
+                $"Series de Banxico no soportadas: {string.Join(", ", unsupported)}");
+        }
+
+        if (TryGetFreshCache(out ExchangeRateFetchResult? cached))
         {
             _logger.LogInformation(
                 "Tasas obtenidas de caché fresca. Series={SeriesIds}",
-                string.Join(",", normalized));
+                string.Join(",", requestedSeries));
             return cached with { IsStale = false };
         }
 
+        SemaphoreSlim refreshLock = RefreshLocks.GetOrAdd(
+            CacheKey,
+            _ => new SemaphoreSlim(1, 1));
+
+        await refreshLock.WaitAsync(cancellationToken);
+
         try
         {
+            if (TryGetFreshCache(out cached))
+            {
+                _logger.LogInformation(
+                    "Tasas obtenidas de la consulta concurrente ya completada.");
+                return cached with { IsStale = false };
+            }
+
+            if (TryServeFailureCooldown(out ExchangeRateFetchResult? stale))
+            {
+                return stale;
+            }
+
+            string[] catalogSeries = ExchangeRateSeriesCatalog.GetAll()
+                .Select(definition => definition.SeriesId)
+                .ToArray();
+
             _logger.LogInformation(
                 "Consultando tasas en Banxico. Series={SeriesIds}",
-                string.Join(",", normalized));
+                string.Join(",", catalogSeries));
 
             ExchangeRateFetchResult fresh = await FetchFromBanxicoAsync(
-                normalized,
+                catalogSeries,
                 cancellationToken);
 
             _memoryCache.Set(
-                cacheKey,
+                CacheKey,
                 fresh,
                 new MemoryCacheEntryOptions
                 {
-                    AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(24)
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(
+                        _options.StaleCacheHours)
                 });
+            _memoryCache.Remove(FailureCacheKey);
 
             return fresh;
         }
+        catch (OperationCanceledException)
+            when (cancellationToken.IsCancellationRequested)
+        {
+            throw;
+        }
+        catch (BanxicoCooldownException)
+        {
+            throw;
+        }
         catch (Exception exception)
         {
+            FailureState failure = RegisterFailure(exception);
+
             _logger.LogError(
                 exception,
-                "No fue posible consultar las series {SeriesIds} en Banxico.",
-                string.Join(",", normalized));
+                "No fue posible consultar Banxico. Reintento disponible en {RetryAtUtc}.",
+                failure.RetryAtUtc);
 
             if (_memoryCache.TryGetValue(
-                cacheKey,
+                CacheKey,
                 out ExchangeRateFetchResult? stale)
                 && stale is not null)
             {
                 _logger.LogWarning(
-                    "Se usarán tasas vencidas. Series={SeriesIds}",
-                    string.Join(",", normalized));
+                    "Se usarán tasas vencidas hasta el siguiente reintento.");
                 return stale with { IsStale = true };
             }
 
-            throw;
+            throw new HttpRequestException(
+                "No fue posible consultar Banxico y no existe una caché previa.",
+                exception);
         }
+        finally
+        {
+            refreshLock.Release();
+        }
+    }
+
+    private bool TryGetFreshCache(
+        [NotNullWhen(true)] out ExchangeRateFetchResult? cached)
+    {
+        return _memoryCache.TryGetValue(CacheKey, out cached)
+            && cached is not null
+            && cached.ExpiresAtUtc > DateTime.UtcNow;
+    }
+
+    private bool TryServeFailureCooldown(
+        [NotNullWhen(true)] out ExchangeRateFetchResult? staleResult)
+    {
+        staleResult = null;
+
+        if (!_memoryCache.TryGetValue(
+                FailureCacheKey,
+                out FailureState? failure)
+            || failure is null
+            || failure.RetryAtUtc <= DateTime.UtcNow)
+        {
+            return false;
+        }
+
+        _logger.LogWarning(
+            "Consulta a Banxico en enfriamiento hasta {RetryAtUtc}.",
+            failure.RetryAtUtc);
+
+        if (_memoryCache.TryGetValue(
+                CacheKey,
+                out ExchangeRateFetchResult? stale)
+            && stale is not null)
+        {
+            staleResult = stale with { IsStale = true };
+            return true;
+        }
+
+        throw new BanxicoCooldownException(
+            $"Banxico está temporalmente en enfriamiento hasta " +
+            $"{failure.RetryAtUtc:O}. Último error: {failure.Message}");
+    }
+
+    private FailureState RegisterFailure(Exception exception)
+    {
+        int failureCount = 1;
+        if (_memoryCache.TryGetValue(
+                FailureCacheKey,
+                out FailureState? previous)
+            && previous is not null)
+        {
+            failureCount = previous.Count + 1;
+        }
+
+        int retryIndex = Math.Min(
+            failureCount - 1,
+            _options.RetryDelayMinutes.Length - 1);
+        DateTime retryAtUtc = DateTime.UtcNow.AddMinutes(
+            _options.RetryDelayMinutes[retryIndex]);
+        var failure = new FailureState(
+            failureCount,
+            retryAtUtc,
+            exception.Message);
+
+        _memoryCache.Set(
+            FailureCacheKey,
+            failure,
+            TimeSpan.FromHours(_options.StaleCacheHours));
+
+        return failure;
     }
 
     private async Task<ExchangeRateFetchResult> FetchFromBanxicoAsync(
@@ -230,4 +351,12 @@ public sealed class BanxicoExchangeRateProvider : IExchangeRateProvider
         observation = (value, effectiveDate);
         return true;
     }
+
+    private sealed record FailureState(
+        int Count,
+        DateTime RetryAtUtc,
+        string Message);
+
+    private sealed class BanxicoCooldownException(string message)
+        : HttpRequestException(message);
 }

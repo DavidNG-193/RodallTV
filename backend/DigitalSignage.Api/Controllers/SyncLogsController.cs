@@ -34,6 +34,28 @@ public class SyncLogsController : ControllerBase
         }
     }
 
+    [HttpGet("paged")]
+    public async Task<IActionResult> GetPaged(
+        [FromQuery] Guid? deviceId,
+        [FromQuery] string? result,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 20)
+    {
+        try
+        {
+            var logs = await _service.GetPagedAsync(
+                deviceId,
+                result,
+                page,
+                pageSize);
+            return Ok(logs);
+        }
+        catch (InvalidOperationException exception)
+        {
+            return BadRequest(new { message = exception.Message });
+        }
+    }
+
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetById(Guid id)
     {

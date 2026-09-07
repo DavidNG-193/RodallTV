@@ -5,6 +5,8 @@ import type {
   Playlist,
   PlaylistItem,
   ReorderPlaylistItemsRequest,
+  SavePlaylistCompositionRequest,
+  SavePlaylistCompositionResponse,
   UpdatePlaylistItemRequest,
   UpdatePlaylistRequest,
 } from "./playlists.types";
@@ -82,6 +84,17 @@ export const playlistsService = {
       `/api/playlists/${playlistId}/items/reorder`,
       request,
     );
+  },
+
+  async saveComposition(
+    playlistId: string,
+    request: SavePlaylistCompositionRequest,
+  ): Promise<SavePlaylistCompositionResponse> {
+    const response = await httpClient.put<SavePlaylistCompositionResponse>(
+      `/api/playlists/${playlistId}/items/composition`,
+      request,
+    );
+    return response.data;
   },
 
   async removeItem(playlistId: string, itemId: string): Promise<void> {

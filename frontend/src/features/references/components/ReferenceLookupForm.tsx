@@ -74,7 +74,7 @@ export function ReferenceLookupForm({
           <span>Nueva referencia</span>
           <h3>Consulta antes de agregar</h3>
         </div>
-        <p>Los datos se obtienen directamente del sistema Saga.</p>
+        <p>Los datos mostrados se obtienen directamente desde Saga.</p>
       </div>
 
       <form className="reference-search" onSubmit={(event) => void handleLookup(event)}>

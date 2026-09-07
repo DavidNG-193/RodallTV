@@ -1,5 +1,5 @@
-import { KeyRound, LogOut } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { LogOut } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../features/auth/useAuth";
 
 export function Header() {
@@ -28,11 +28,6 @@ export function Header() {
         </div>
 
         <div className="header__actions">
-          <Link className="button button--ghost" to="/change-password">
-            <KeyRound size={18} aria-hidden="true" />
-            Cambiar contraseña
-          </Link>
-
           <button type="button" className="button button--ghost" onClick={handleLogout}>
             <LogOut size={18} aria-hidden="true" />
             Cerrar sesión

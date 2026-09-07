@@ -166,7 +166,7 @@ export function DailyReferencesPage() {
       <div className="page-heading references-page__heading">
         <div>
           <p className="page-heading__eyebrow">Panel de señalización</p>
-          <h2>Referencias del día</h2>
+          <h2>Referencias activas</h2>
           <p>Consulta en Saga y administra las referencias visibles en todas las pantallas.</p>
         </div>
       </div>

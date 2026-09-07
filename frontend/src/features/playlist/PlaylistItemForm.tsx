@@ -1,41 +1,33 @@
 import { useState, type FormEvent } from "react";
-import type { MediaItem } from "../media/media.types";
 import type {
-  CreatePlaylistItemRequest,
   PlaylistItem,
   UpdatePlaylistItemRequest,
 } from "./playlists.types";
 
 interface PlaylistItemFormProps {
-  media: MediaItem[];
-  item?: PlaylistItem | null;
+  item: PlaylistItem;
   isSubmitting: boolean;
-  onSubmit: (
-    request: CreatePlaylistItemRequest | UpdatePlaylistItemRequest,
-  ) => Promise<void>;
+  onSubmit: (request: UpdatePlaylistItemRequest) => Promise<void>;
   onCancel: () => void;
 }
 
 export function PlaylistItemForm({
   ...props
 }: PlaylistItemFormProps) {
-  const formKey = props.item
-    ? `${props.item.id}-${props.item.customDurationSeconds ?? "default"}`
-    : "new-playlist-item";
+  const formKey =
+    `${props.item.id}-${props.item.customDurationSeconds ?? "default"}`;
 
   return <PlaylistItemFormFields key={formKey} {...props} />;
 }
 
 function PlaylistItemFormFields({
-  media,
   item,
   isSubmitting,
   onSubmit,
   onCancel,
 }: PlaylistItemFormProps) {
-  const [mediaId, setMediaId] = useState(item?.mediaId ?? "");
   const [customDurationSeconds, setCustomDurationSeconds] = useState(
-    item?.customDurationSeconds?.toString() ?? "",
+    item.customDurationSeconds?.toString() ?? "",
   );
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -45,49 +37,34 @@ function PlaylistItemFormFields({
       ? Number(customDurationSeconds)
       : null;
 
-    if (item) {
-      await onSubmit({ customDurationSeconds: duration });
-      return;
-    }
-
-    await onSubmit({
-      mediaId,
-      customDurationSeconds: duration,
-    });
+    await onSubmit({ customDurationSeconds: duration });
   };
 
   return (
     <form className="playlist-item-form" onSubmit={handleSubmit}>
-      {!item && (
-        <div className="form-field">
-          <label htmlFor="playlist-media">Archivo multimedia</label>
-          <select
-            id="playlist-media"
-            value={mediaId}
-            onChange={(event) => setMediaId(event.target.value)}
-            required
-          >
-            <option value="">Selecciona un archivo</option>
-            {media.map((mediaItem) => (
-              <option key={mediaItem.id} value={mediaItem.id}>
-                {mediaItem.originalFileName}
-              </option>
-            ))}
-          </select>
-        </div>
-      )}
-
       <div className="form-field">
-        <label htmlFor="custom-duration">Duración personalizada</label>
+        <label htmlFor="custom-duration">
+          Duración personalizada (segundos)
+        </label>
         <input
           id="custom-duration"
-          type="number"
-          min="1"
-          step="1"
+          type="text"
+          inputMode="numeric"
+          pattern="[0-9]*"
+          maxLength={10}
           value={customDurationSeconds}
-          onChange={(event) => setCustomDurationSeconds(event.target.value)}
-          placeholder="Vacío para usar la duración predeterminada"
+          onChange={(event) =>
+            setCustomDurationSeconds(
+              event.target.value.replace(/\D/g, ""),
+            )
+          }
+          placeholder="Ejemplo: 10"
+          aria-describedby="custom-duration-help"
         />
+        <small id="custom-duration-help">
+          Ingresa la duración en segundos o deja el campo vacío para usar
+          la duración predeterminada.
+        </small>
       </div>
 
       <div className="form-actions">
@@ -105,15 +82,12 @@ function PlaylistItemFormFields({
           className="button button--primary"
           disabled={
             isSubmitting ||
-            (!item && !mediaId) ||
-            (customDurationSeconds !== "" && Number(customDurationSeconds) <= 0)
+            (customDurationSeconds !== "" &&
+              (Number(customDurationSeconds) <= 0 ||
+                Number(customDurationSeconds) > 2147483647))
           }
         >
-          {isSubmitting
-            ? "Guardando..."
-            : item
-              ? "Guardar duración"
-              : "Agregar elemento"}
+          {isSubmitting ? "Guardando..." : "Guardar duración"}
         </button>
       </div>
     </form>

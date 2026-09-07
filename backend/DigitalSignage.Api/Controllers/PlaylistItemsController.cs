@@ -118,6 +118,31 @@ public class PlaylistItemsController : ControllerBase
         }
     }
 
+    [HttpPut("composition")]
+    public async Task<IActionResult> SaveComposition(
+        Guid playlistId,
+        SavePlaylistItemsRequestDto request)
+    {
+        try
+        {
+            var result = await _playlistItemService.SaveCompositionAsync(
+                playlistId,
+                request);
+
+            return result is null
+                ? NotFound(new { message = "Playlist no encontrada o inactiva." })
+                : Ok(result);
+        }
+        catch (PlaylistVersionConflictException exception)
+        {
+            return Conflict(new { message = exception.Message });
+        }
+        catch (InvalidOperationException exception)
+        {
+            return BadRequest(new { message = exception.Message });
+        }
+    }
+
     [HttpDelete("{itemId:guid}")]
     public async Task<IActionResult> Delete(Guid playlistId, Guid itemId)
     {

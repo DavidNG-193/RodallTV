@@ -120,7 +120,11 @@ public sealed class OpenMeteoWeatherProvider : IWeatherProvider
             "apparent_temperature," +
             "relative_humidity_2m," +
             "precipitation," +
+            "rain," +
+            "showers," +
             "weather_code," +
+            "cloud_cover," +
+            "is_day," +
             "wind_speed_10m" +
             $"&timezone={encodedTimezone}";
 
@@ -153,7 +157,11 @@ public sealed class OpenMeteoWeatherProvider : IWeatherProvider
             response.Current.ApparentTemperature,
             response.Current.RelativeHumidity,
             response.Current.Precipitation,
+            response.Current.Rain,
+            response.Current.Showers,
             response.Current.WeatherCode,
+            response.Current.CloudCover,
+            response.Current.IsDay == 1,
             response.Current.WindSpeed,
             observationTime);
     }
