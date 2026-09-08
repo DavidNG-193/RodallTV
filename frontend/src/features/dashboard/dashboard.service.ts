@@ -106,9 +106,9 @@ export const dashboardService = {
     ) {
       return {
         level: "warning",
-        title: "Algunos dispositivos están desconectados",
+        title: "Algunos dispositivos no están en linea",
         description:
-          "Revisa la conexión de los dispositivos que no aparecen en línea.",
+          "Revisa la conexión de los dispositivos que aparecen sin sincronizar.",
       };
     }
 
