@@ -34,6 +34,7 @@ builder.Services.AddScoped<DeviceService>();
 builder.Services.AddScoped<MediaFolderService>();
 builder.Services.AddScoped<MediaService>();
 builder.Services.AddScoped<MediaThumbnailService>();
+builder.Services.AddSingleton<MediaStorageService>();
 builder.Services.AddScoped<PlaylistService>();
 builder.Services.AddScoped<PlaylistItemService>();
 builder.Services.AddScoped<PlaylistAssignmentService>();
@@ -105,6 +106,17 @@ builder.Services.Configure<FormOptions>(options =>
 {
     options.MultipartBodyLengthLimit = maxUploadSize;
 });
+
+builder.Services.AddOptions<MediaStorageOptions>()
+    .Bind(builder.Configuration.GetSection(MediaStorageOptions.SectionName))
+    .Validate(
+        options => !string.IsNullOrWhiteSpace(options.RootPath),
+        "MediaStorage:RootPath es obligatorio.")
+    .Validate(
+        options => Path.IsPathRooted(
+            Environment.ExpandEnvironmentVariables(options.RootPath)),
+        "MediaStorage:RootPath debe ser una ruta absoluta.")
+    .ValidateOnStart();
 
 builder.WebHost.ConfigureKestrel(options =>
 {
@@ -244,6 +256,10 @@ builder.Services.AddScoped<
     PermissionAuthorizationHandler>();
 
 var app = builder.Build();
+
+await app.Services
+    .GetRequiredService<MediaStorageService>()
+    .InitializeAsync();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

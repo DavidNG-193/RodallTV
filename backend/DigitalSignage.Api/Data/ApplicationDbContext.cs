@@ -242,11 +242,6 @@ public class ApplicationDbContext : DbContext
             entity.Property(e => e.DurationSeconds)
                 .HasColumnName("duration_seconds");
 
-            entity.Property(e => e.FilePath)
-                .HasColumnName("file_path")
-                .HasMaxLength(500)
-                .IsRequired();
-
             entity.Property(e => e.HashSha256)
                 .HasColumnName("hash_sha256")
                 .HasMaxLength(64)

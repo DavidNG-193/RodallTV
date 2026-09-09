@@ -22,16 +22,16 @@ public class MediaService
         };
 
     private readonly ApplicationDbContext _context;
-    private readonly IWebHostEnvironment _environment;
+    private readonly MediaStorageService _storage;
     private readonly MediaThumbnailService _thumbnailService;
 
     public MediaService(
         ApplicationDbContext context,
-        IWebHostEnvironment environment,
+        MediaStorageService storage,
         MediaThumbnailService thumbnailService)
     {
         _context = context;
-        _environment = environment;
+        _storage = storage;
         _thumbnailService = thumbnailService;
     }
 
@@ -186,16 +186,7 @@ public class MediaService
         string originalFileName = Path.GetFileName(request.File.FileName);
         string extension = Path.GetExtension(originalFileName).ToLowerInvariant();
         string storedFileName = $"{Guid.NewGuid():N}{extension}";
-        string storageDirectory = Path.Combine(
-            _environment.ContentRootPath,
-            "Storage",
-            "Media");
-
-        Directory.CreateDirectory(storageDirectory);
-
-        string physicalPath = Path.Combine(storageDirectory, storedFileName);
-        string relativePath = Path.Combine("Storage", "Media", storedFileName)
-            .Replace('\\', '/');
+        string physicalPath = _storage.GetOriginalPath(storedFileName);
 
         try
         {
@@ -223,7 +214,6 @@ public class MediaService
                 MediaType = mediaType,
                 FileSizeBytes = request.File.Length,
                 DurationSeconds = null,
-                FilePath = relativePath,
                 HashSha256 = hashSha256,
                 UploadedAt = DateTime.UtcNow,
                 UploadedByUserId = uploader.Id,
@@ -262,22 +252,7 @@ public class MediaService
             return null;
         }
 
-        string physicalPath = Path.GetFullPath(Path.Combine(
-            _environment.ContentRootPath,
-            media.FilePath));
-
-        string storageRoot = Path.GetFullPath(Path.Combine(
-            _environment.ContentRootPath,
-            "Storage",
-            "Media"));
-
-        if (!physicalPath.StartsWith(
-            storageRoot,
-            StringComparison.OrdinalIgnoreCase))
-        {
-            throw new InvalidOperationException(
-                "La ruta del archivo multimedia no es válida.");
-        }
+        string physicalPath = _storage.GetOriginalPath(media.StoredFileName);
 
         if (!File.Exists(physicalPath))
         {

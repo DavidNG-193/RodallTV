@@ -10,7 +10,6 @@ public class Media
     public string MediaType { get; set; } = string.Empty;
     public long FileSizeBytes { get; set; }
     public int? DurationSeconds { get; set; }
-    public string FilePath { get; set; } = string.Empty;
     public string HashSha256 { get; set; } = string.Empty;
     public DateTime UploadedAt { get; set; } = DateTime.UtcNow;
     public Guid UploadedByUserId { get; set; }

@@ -16,15 +16,18 @@ public class MediaThumbnailService
     private static readonly SemaphoreSlim GenerationThrottle = new(2, 2);
 
     private readonly IWebHostEnvironment _environment;
+    private readonly MediaStorageService _storage;
     private readonly IConfiguration _configuration;
     private readonly ILogger<MediaThumbnailService> _logger;
 
     public MediaThumbnailService(
         IWebHostEnvironment environment,
+        MediaStorageService storage,
         IConfiguration configuration,
         ILogger<MediaThumbnailService> logger)
     {
         _environment = environment;
+        _storage = storage;
         _configuration = configuration;
         _logger = logger;
     }
@@ -33,10 +36,10 @@ public class MediaThumbnailService
         Media media,
         CancellationToken cancellationToken = default)
     {
-        string thumbnailDirectory = GetThumbnailDirectory();
-        string webpPath = Path.Combine(thumbnailDirectory, $"{media.Id:N}.webp");
-        string jpegPath = Path.Combine(thumbnailDirectory, $"{media.Id:N}.jpg");
-        string pngPath = Path.Combine(thumbnailDirectory, $"{media.Id:N}.png");
+        string thumbnailDirectory = _storage.ThumbnailsPath;
+        string webpPath = _storage.GetThumbnailPath(media.Id, ".webp");
+        string jpegPath = _storage.GetThumbnailPath(media.Id, ".jpg");
+        string pngPath = _storage.GetThumbnailPath(media.Id, ".png");
 
         if (File.Exists(webpPath))
         {
@@ -74,7 +77,7 @@ public class MediaThumbnailService
             }
 
             Directory.CreateDirectory(thumbnailDirectory);
-            string sourcePath = ResolveMediaPath(media.FilePath);
+            string sourcePath = _storage.GetOriginalPath(media.StoredFileName);
 
             if (!File.Exists(sourcePath))
             {
@@ -125,11 +128,9 @@ public class MediaThumbnailService
 
     public void Delete(Guid mediaId)
     {
-        string directory = GetThumbnailDirectory();
-
         foreach (string extension in new[] { ".webp", ".jpg", ".png" })
         {
-            string path = Path.Combine(directory, $"{mediaId:N}{extension}");
+            string path = _storage.GetThumbnailPath(mediaId, extension);
             if (File.Exists(path))
             {
                 File.Delete(path);
@@ -291,28 +292,6 @@ public class MediaThumbnailService
         }
 
         return false;
-    }
-
-    private string GetThumbnailDirectory() => Path.Combine(
-        _environment.ContentRootPath,
-        "Storage",
-        "Media",
-        "Thumbnails");
-
-    private string ResolveMediaPath(string storedPath)
-    {
-        string path = Path.GetFullPath(Path.Combine(_environment.ContentRootPath, storedPath));
-        string storageRoot = Path.GetFullPath(Path.Combine(
-            _environment.ContentRootPath,
-            "Storage",
-            "Media"));
-
-        if (!path.StartsWith(storageRoot, StringComparison.OrdinalIgnoreCase))
-        {
-            throw new InvalidOperationException("La ruta del archivo multimedia no es válida.");
-        }
-
-        return path;
     }
 
     private static MediaFileResultDto ToResult(

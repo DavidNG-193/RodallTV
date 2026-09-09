@@ -22,7 +22,7 @@ public class AgentController : ControllerBase
     private readonly IAgentExchangeRateService _exchangeRateService;
     private readonly IAgentWeatherService _weatherService;
     private readonly IAgentReferenceService _referenceService;
-    private readonly IWebHostEnvironment _environment;
+    private readonly MediaStorageService _storage;
     private readonly ILogger<AgentController> _logger;
 
     public AgentController(
@@ -31,7 +31,7 @@ public class AgentController : ControllerBase
         IAgentExchangeRateService exchangeRateService,
         IAgentWeatherService weatherService,
         IAgentReferenceService referenceService,
-        IWebHostEnvironment environment,
+        MediaStorageService storage,
         ILogger<AgentController> logger)
     {
         _authenticationService = authenticationService;
@@ -39,7 +39,7 @@ public class AgentController : ControllerBase
         _exchangeRateService = exchangeRateService;
         _weatherService = weatherService;
         _referenceService = referenceService;
-        _environment = environment;
+        _storage = storage;
         _logger = logger;
     }
 
@@ -250,7 +250,7 @@ public class AgentController : ControllerBase
             });
         }
 
-        var filePath = ResolveMediaPath(media.FilePath);
+        var filePath = _storage.GetOriginalPath(media.StoredFileName);
 
         if (!System.IO.File.Exists(filePath))
         {
@@ -354,14 +354,4 @@ public class AgentController : ControllerBase
             cancellationToken);
     }
 
-    private string ResolveMediaPath(string storedPath)
-    {
-        if (Path.IsPathRooted(storedPath))
-        {
-            return storedPath;
-        }
-
-        return Path.GetFullPath(
-            Path.Combine(_environment.ContentRootPath, storedPath));
-    }
 }

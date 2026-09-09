@@ -17,10 +17,14 @@ public class AgentService
         };
 
     private readonly ApplicationDbContext _context;
+    private readonly MediaStorageService _storage;
 
-    public AgentService(ApplicationDbContext context)
+    public AgentService(
+        ApplicationDbContext context,
+        MediaStorageService storage)
     {
         _context = context;
+        _storage = storage;
     }
 
     public async Task<AgentHeartbeatResponseDto> ProcessHeartbeatAsync(
@@ -167,8 +171,8 @@ public class AgentService
         foreach (var item in orderedItems)
         {
             if (!item.Media.IsActive ||
-                string.IsNullOrWhiteSpace(item.Media.FilePath) ||
-                !File.Exists(item.Media.FilePath))
+                string.IsNullOrWhiteSpace(item.Media.StoredFileName) ||
+                !_storage.OriginalExists(item.Media.StoredFileName))
             {
                 return null;
             }
